@@ -32,7 +32,7 @@ import org.wso2.balana.utils.policy.dto.RequestElementDTO;
 public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
 
     private static Log log = LogFactory.getLog(PepAccessRequest.class);
-
+    
     public static PepAccessRequest newInstance(String subject, String action, String resourceUrl, String issuer) {
         PepAccessRequest request = new PepAccessRequest();
         PepRequestAttribute attribute;
@@ -65,7 +65,7 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         }
     }
 
-    public Element toElement() throws Exception {
+    public Map<String, List<PepRequestAttribute>> getCategories() {
         // Since XACML 3.0 organizes categories in <Attributes> blocks, 
         // we group the simple list of attributes in a map by category.
         Map<String, List<PepRequestAttribute>> categories = new HashMap<>();
@@ -77,6 +77,13 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
             }
             categoryList.add(entry);
         }
+        return categories;
+    }
+    
+    public Element toElement() throws Exception {
+        // Since XACML 3.0 organizes categories in <Attributes> blocks, 
+        // we group the simple list of attributes in a map by category.
+        Map<String, List<PepRequestAttribute>> categories = getCategories();
         // we now build the request, using balana as much as possible.
         RequestElementDTO requestElementDTO = new RequestElementDTO();
         List<AttributesElementDTO> attributesElementDTOs = new ArrayList<>();
