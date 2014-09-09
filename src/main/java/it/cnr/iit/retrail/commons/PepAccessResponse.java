@@ -18,14 +18,11 @@ import org.w3c.dom.NodeList;
 public class PepAccessResponse {
 
     private static final Log log = LogFactory.getLog(PepAccessRequest.class);
-    private final Element element;
+    protected final Element element;
 
     public String message = "";
 
-    public String sessionId, sessionCookie;
-
     public enum DecisionEnum {
-
         Indeterminate, NotApplicable, Deny, Permit
     };
 
@@ -40,26 +37,9 @@ public class PepAccessResponse {
         NodeList statusMessages = element.getElementsByTagName("StatusMessage");
         if (statusMessages.getLength() > 0) 
             message = statusMessages.item(0).getTextContent();
-        
-        Element session = (Element) element.getElementsByTagName("Session").item(0);
-        if (session != null) {
-            this.sessionId = session.getAttributeNS(null, "id");
-            this.sessionCookie = session.getAttributeNS(null, "cookie");
-        }
     }
 
     public Element toElement() {
         return element;
-    }
-
-    public void addSessionInfo(String id, String cookie) {
-        Element session = element.getOwnerDocument().createElementNS(null, "Session");
-        session.setAttributeNS(null, "id", id);
-        session.setAttributeNS(null, "cookie", cookie);
-        this.sessionId = id;
-        this.sessionCookie = cookie;
-        element.appendChild(session);
-        System.out.println("PepAccessResponse.addSessionInfo:");
-        DomUtils.write(element);
     }
 }
