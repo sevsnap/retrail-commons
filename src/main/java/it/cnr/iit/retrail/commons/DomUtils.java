@@ -49,6 +49,12 @@ public class DomUtils {
         }
     }
     
+    public static Document newDocument() throws ParserConfigurationException {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	return dBuilder.newDocument();
+    }
+    
     public static Document read(String data) throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();

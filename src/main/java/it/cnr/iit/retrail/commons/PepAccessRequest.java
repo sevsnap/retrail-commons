@@ -30,7 +30,7 @@ import org.wso2.balana.utils.policy.dto.RequestElementDTO;
  * @author oneadmin
  */
 public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
-
+    // Attributes may be overwritten (they are simply replaced).
     private static Log log = LogFactory.getLog(PepAccessRequest.class);
     
     public static PepAccessRequest newInstance(String subject, String action, String resourceUrl, String issuer) {
@@ -65,6 +65,23 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         }
     }
 
+    @Override
+    public boolean add(PepRequestAttribute attribute) {
+        // TODO inefficient implementation
+        for(PepRequestAttribute a: this) {
+            if(a.category.equals(attribute.id) && a.id.equals(attribute.category)) {
+                super.remove(a);
+                break;
+            }
+        }
+        return super.add(attribute);
+    }
+    
+    @Override
+    public boolean remove(Object attribute) {
+        throw new UnsupportedOperationException("attribute removal is not allowed");
+    }
+    
     public Map<String, List<PepRequestAttribute>> getCategories() {
         // Since XACML 3.0 organizes categories in <Attributes> blocks, 
         // we group the simple list of attributes in a map by category.

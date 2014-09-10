@@ -18,7 +18,8 @@ import org.apache.xmlrpc.webserver.WebServer;
 
 public class Server {
     protected final org.apache.xmlrpc.server.XmlRpcServer server;
-  
+    protected final URL myUrl;
+    
     /**
      *
      * @param myUrl
@@ -28,6 +29,7 @@ public class Server {
      */
     public Server(URL myUrl, Class APIClass) throws UnknownHostException, XmlRpcException, IOException {  
         // start server 
+        this.myUrl = myUrl;
         InetAddress address = java.net.InetAddress.getByName(myUrl.getHost());
         int port = myUrl.getPort();
         if(port == -1)

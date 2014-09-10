@@ -2,6 +2,7 @@
  */
 package it.cnr.iit.retrail.commons;
 
+import java.util.Date;
 import org.w3c.dom.Element;
 import org.wso2.balana.utils.Constants.PolicyConstants;
 
@@ -12,6 +13,7 @@ import org.wso2.balana.utils.Constants.PolicyConstants;
 public class PepRequestAttribute {
 
     public final String id, type, value, issuer, category;
+    public Date expires;
     
     public static class CATEGORIES {
         static final public String SUBJECT = PolicyConstants.SUBJECT_CATEGORY_URI;

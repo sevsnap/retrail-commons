@@ -42,7 +42,7 @@ public class PepSession extends PepAccessResponse {
         } 
     }
 
-    public void addSessionInfo(String id, String cookie) {
+    public void addSession(String id, String cookie) {
         Element session = element.getOwnerDocument().createElementNS(null, "Session");
         session.setAttributeNS(null, "id", id);
         session.setAttributeNS(null, "cookie", cookie);
@@ -51,5 +51,10 @@ public class PepSession extends PepAccessResponse {
         element.appendChild(session);
         System.out.println("PepAccessResponse.addSessionInfo:");
         DomUtils.write(element);
+    }
+    
+    @Override
+    public String toString() {
+        return "PepSession [id="+id+", cookie="+cookie+"]";
     }
 }
