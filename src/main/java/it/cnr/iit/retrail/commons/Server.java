@@ -10,13 +10,17 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 
 
-public class Server {
+public class Server implements Runnable {
+    public static final int heartbeatPeriod = 15;
+
     protected final org.apache.xmlrpc.server.XmlRpcServer server;
     public final URL myUrl;
     
@@ -48,6 +52,28 @@ public class Server {
         serverConfig.setEnabledForExtensions(true);
         serverConfig.setContentLengthOptional(false);
         webServer.start();
+    }
+
+    protected void heartbeat() {
+        Logger.getLogger(getClass().getName()).log(Level.INFO, "Server.heartbeat(): idle call");
+    }
+    
+    public void init() {        // start heartbeat
+        (new Thread(this)).start();
+    }
+
+    @Override
+    public void run() {
+        // heartbeat
+        while (true) {
+            try {
+                heartbeat();
+                Thread.sleep(heartbeatPeriod * 1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                return;
+            }
+        }
     }
     
 }
