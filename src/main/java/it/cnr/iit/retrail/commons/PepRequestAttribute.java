@@ -85,5 +85,9 @@ public class PepRequestAttribute {
         type = attributeValue.getAttribute(PolicyConstants.DATA_TYPE);
         value = attributeValue.getTextContent();
     }
+    
+    public String toString() {
+        return "PepRequestAttribute [id="+id+", value="+value+"]";
+    }
 
 }

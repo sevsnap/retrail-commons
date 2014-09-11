@@ -53,11 +53,7 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         super();
         Element req;
         req = (Element) doc.getElementsByTagName(PolicyConstants.Request.REQUEST_ELEMENT).item(0);
-        System.out.println("PepAccessRequest creo da doc:"+req);
-        DomUtils.write(req);
-        System.out.println("PepAccessRequest creo da doc 2: ");
         NodeList children = req.getElementsByTagName(PolicyConstants.ATTRIBUTE);
-        System.out.println("PepAccessRequest creo da doc 3: "+children);
         for (int i = 0; i < children.getLength(); i++) {
             Element e = (Element) children.item(i);
             PepRequestAttribute a = new PepRequestAttribute(e);
@@ -70,10 +66,12 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         // TODO inefficient implementation
         for(PepRequestAttribute a: this) {
             if(a.category.equals(attribute.id) && a.id.equals(attribute.category)) {
+                System.out.println("PepAccessRequest.add(): already present, removing "+attribute);
                 super.remove(a);
                 break;
             }
         }
+        System.out.println("PepAccessRequest.add(): adding "+attribute);
         return super.add(attribute);
     }
     

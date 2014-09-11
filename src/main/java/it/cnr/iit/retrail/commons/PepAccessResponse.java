@@ -30,8 +30,6 @@ public class PepAccessResponse {
 
     public PepAccessResponse(Document doc) {
         element = (Element) doc.getElementsByTagName("Response").item(0);
-        log.warn("PepAccessResponse creo da doc:" + element);
-        DomUtils.write(element);
         String decisionString = element.getElementsByTagName("Decision").item(0).getTextContent();
         decision = DecisionEnum.valueOf(decisionString);
         NodeList statusMessages = element.getElementsByTagName("StatusMessage");

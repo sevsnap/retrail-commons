@@ -6,8 +6,12 @@
 
 package it.cnr.iit.retrail.commons;
 
+import java.io.IOException;
+import java.util.Objects;
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -16,6 +20,10 @@ import org.w3c.dom.Element;
 public class PepSession extends PepAccessResponse {
     
     private String id, cookie;
+
+    public PepSession(DecisionEnum decisionEnum, String statusMessage) throws ParserConfigurationException, SAXException, IOException {   
+        super(DomUtils.read("<Response><Result><Decision>"+decisionEnum.name()+"</Decision><StatusMessage>"+statusMessage+"</StatusMessage></Result></Response>"));
+    }
 
     public String getId() {
         return id;
@@ -49,12 +57,32 @@ public class PepSession extends PepAccessResponse {
         this.id = id;
         this.cookie = cookie;
         element.appendChild(session);
-        System.out.println("PepAccessResponse.addSessionInfo:");
-        DomUtils.write(element);
     }
     
     @Override
     public String toString() {
-        return "PepSession [id="+id+", cookie="+cookie+"]";
+        return "PepSession [id="+id+", cookie="+cookie+", decision="+decision+", message="+message+"]";
     }
+    
+    @Override
+    public int hashCode() {
+        int hash = id.hashCode();
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PepSession other = (PepSession) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
+    }
+
 }

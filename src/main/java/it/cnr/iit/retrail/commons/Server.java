@@ -18,7 +18,7 @@ import org.apache.xmlrpc.webserver.WebServer;
 
 public class Server {
     protected final org.apache.xmlrpc.server.XmlRpcServer server;
-    protected final URL myUrl;
+    public final URL myUrl;
     
     /**
      *
