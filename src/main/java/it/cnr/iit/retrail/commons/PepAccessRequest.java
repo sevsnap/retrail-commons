@@ -18,6 +18,8 @@ import org.w3c.dom.NodeList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.balana.utils.Constants.PolicyConstants;
 import org.wso2.balana.utils.PolicyUtils;
 
@@ -31,7 +33,7 @@ import org.wso2.balana.utils.policy.dto.RequestElementDTO;
  */
 public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
     // Attributes may be overwritten (they are simply replaced).
-    private static Log log = LogFactory.getLog(PepAccessRequest.class);
+    protected static final Logger log = LoggerFactory.getLogger(PepAccessRequest.class);
     
     public static PepAccessRequest newInstance(String subject, String action, String resourceUrl, String issuer) {
         PepAccessRequest request = new PepAccessRequest();
@@ -66,12 +68,12 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         // TODO inefficient implementation
         for(PepRequestAttribute a: this) {
             if(a.category.equals(attribute.id) && a.id.equals(attribute.category)) {
-                System.out.println("PepAccessRequest.add(): already present, removing "+attribute);
+                log.warn("already present, removing "+attribute);
                 super.remove(a);
                 break;
             }
         }
-        System.out.println("PepAccessRequest.add(): adding "+attribute);
+        log.info("adding "+attribute);
         return super.add(attribute);
     }
     

@@ -10,20 +10,23 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.BasicConfigurator;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
+import org.apache.xmlrpc.server.XmlRpcServer;
 import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Server implements Runnable {
     public static final int heartbeatPeriod = 15;
-
-    protected final org.apache.xmlrpc.server.XmlRpcServer server;
-    public final URL myUrl;
     
+    public final URL myUrl;
+    private final WebServer webServer;
+    protected static final Logger log = LoggerFactory.getLogger(Server.class);
+
     /**
      *
      * @param myUrl
@@ -31,8 +34,7 @@ public class Server implements Runnable {
      * @throws java.net.UnknownHostException
      * @throws org.apache.xmlrpc.XmlRpcException
      */
-    public Server(URL myUrl, Class APIClass) throws UnknownHostException, XmlRpcException, IOException {  
-        // start server 
+    public Server(URL myUrl, Class APIClass) throws UnknownHostException, XmlRpcException {  
         this.myUrl = myUrl;
         InetAddress address = java.net.InetAddress.getByName(myUrl.getHost());
         int port = myUrl.getPort();
@@ -40,8 +42,8 @@ public class Server implements Runnable {
             port = myUrl.getDefaultPort();
         if(port == -1)
             port = 80;
-        WebServer webServer = new WebServer(port, address);
-        server = webServer.getXmlRpcServer();
+        webServer = new WebServer(port, address);
+        XmlRpcServer server = webServer.getXmlRpcServer();
         PropertyHandlerMapping phm;
         phm = new PropertyHandlerMapping();
         phm.addHandler(getClass().getSimpleName(), APIClass);
@@ -51,16 +53,19 @@ public class Server implements Runnable {
                 = (XmlRpcServerConfigImpl) server.getConfig();
         serverConfig.setEnabledForExtensions(true);
         serverConfig.setContentLengthOptional(false);
+    }
+
+    public void init() throws IOException  {
+        // start server 
         webServer.start();
+        // start heartbeat
+        (new Thread(this)).start();
     }
 
     protected void heartbeat() {
-        Logger.getLogger(getClass().getName()).log(Level.INFO, "Server.heartbeat(): idle call");
+        log.info("Server.heartbeat(): idle call");
     }
     
-    public void init() {        // start heartbeat
-        (new Thread(this)).start();
-    }
 
     @Override
     public void run() {
@@ -70,7 +75,7 @@ public class Server implements Runnable {
                 heartbeat();
                 Thread.sleep(heartbeatPeriod * 1000);
             } catch (InterruptedException ex) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                log.error("unexpected exception: {}", ex);
                 return;
             }
         }
