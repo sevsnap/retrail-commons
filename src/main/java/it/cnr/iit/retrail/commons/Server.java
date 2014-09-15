@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServer;
@@ -21,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 
 public class Server implements Runnable {
-    public static final int heartbeatPeriod = 15;
+    public static final int watchdogPeriod = 15;
     
     public final URL myUrl;
     private final WebServer webServer;
@@ -46,6 +45,7 @@ public class Server implements Runnable {
         XmlRpcServer server = webServer.getXmlRpcServer();
         PropertyHandlerMapping phm;
         phm = new PropertyHandlerMapping();
+        log.info("class: "+getClass().getSimpleName()+", api: "+APIClass);
         phm.addHandler(getClass().getSimpleName(), APIClass);
         server.setHandlerMapping(phm);
 
@@ -53,6 +53,9 @@ public class Server implements Runnable {
                 = (XmlRpcServerConfigImpl) server.getConfig();
         serverConfig.setEnabledForExtensions(true);
         serverConfig.setContentLengthOptional(false);
+        log.info("available xmlrpc methods:");
+        for(String method: phm.getListMethods()) 
+            log.info(method);
     }
 
     public void init() throws IOException  {
@@ -62,7 +65,7 @@ public class Server implements Runnable {
         (new Thread(this)).start();
     }
 
-    protected void heartbeat() {
+    protected void watchdog() {
         log.info("Server.heartbeat(): idle call");
     }
     
@@ -72,8 +75,8 @@ public class Server implements Runnable {
         // heartbeat
         while (true) {
             try {
-                heartbeat();
-                Thread.sleep(heartbeatPeriod * 1000);
+                watchdog();
+                Thread.sleep(watchdogPeriod * 1000);
             } catch (InterruptedException ex) {
                 log.error("unexpected exception: {}", ex);
                 return;

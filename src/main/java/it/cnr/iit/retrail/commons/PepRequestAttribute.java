@@ -14,6 +14,7 @@ public class PepRequestAttribute {
 
     public final String id, type, value, issuer, category;
     public Date expires;
+    public String factory;
     
     public static class CATEGORIES {
         static final public String SUBJECT = PolicyConstants.SUBJECT_CATEGORY_URI;
@@ -85,7 +86,7 @@ public class PepRequestAttribute {
         type = attributeValue.getAttribute(PolicyConstants.DATA_TYPE);
         value = attributeValue.getTextContent();
     }
-    
+
     public String toString() {
         return "PepRequestAttribute [id="+id+", value="+value+"]";
     }

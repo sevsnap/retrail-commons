@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.balana.XACMLConstants;
 import org.wso2.balana.utils.Constants.PolicyConstants;
 import org.wso2.balana.utils.PolicyUtils;
 
@@ -67,7 +68,7 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
     public boolean add(PepRequestAttribute attribute) {
         // TODO inefficient implementation
         for(PepRequestAttribute a: this) {
-            if(a.category.equals(attribute.id) && a.id.equals(attribute.category)) {
+            if(a.category.equals(attribute.category) && a.id.equals(attribute.id)) {
                 log.warn("already present, removing "+attribute);
                 super.remove(a);
                 break;
@@ -103,6 +104,7 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         Map<String, List<PepRequestAttribute>> categories = getCategories();
         // we now build the request, using balana as much as possible.
         RequestElementDTO requestElementDTO = new RequestElementDTO();
+           
         List<AttributesElementDTO> attributesElementDTOs = new ArrayList<>();
         requestElementDTO.setCombinedDecision(false);
         requestElementDTO.setReturnPolicyIdList(false);
@@ -130,7 +132,9 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
 
         // root elements
         Document doc = docBuilder.newDocument();
-        return PolicyUtils.createRequestElement(requestElementDTO, doc);
+        Element root = PolicyUtils.createRequestElement(requestElementDTO, doc);
+        //doc.setDocumentURI(XACMLConstants.REQUEST_CONTEXT_3_0_IDENTIFIER);
+        return root;
     }
 
 }
