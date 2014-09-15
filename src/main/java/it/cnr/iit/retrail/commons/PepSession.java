@@ -20,6 +20,12 @@ import org.xml.sax.SAXException;
 public class PepSession extends PepAccessResponse {
     
     private String id, cookie;
+    
+    public enum Status {
+        TRY, ONGOING, REVOKED
+    }
+    
+    Status status = Status.TRY;
 
     public PepSession(DecisionEnum decisionEnum, String statusMessage) throws ParserConfigurationException, SAXException, IOException {   
         super(DomUtils.read("<Response><Result><Decision>"+decisionEnum.name()+"</Decision><StatusMessage>"+statusMessage+"</StatusMessage></Result></Response>"));
@@ -41,6 +47,14 @@ public class PepSession extends PepAccessResponse {
         this.cookie = cookie;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     public PepSession(Document doc) {
         super(doc);
         Element session = (Element) element.getElementsByTagName("Session").item(0);
@@ -50,12 +64,14 @@ public class PepSession extends PepAccessResponse {
         } 
     }
 
-    public void addSession(String id, String cookie) {
+    public void addSession(String id, String cookie, Status status) {
         Element session = element.getOwnerDocument().createElementNS(null, "Session");
         session.setAttributeNS(null, "id", id);
         session.setAttributeNS(null, "cookie", cookie);
+        session.setAttributeNS(null, "status", status.toString());
         this.id = id;
         this.cookie = cookie;
+        this.status = status;
         element.appendChild(session);
     }
     

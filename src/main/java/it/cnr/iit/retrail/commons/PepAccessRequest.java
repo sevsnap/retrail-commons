@@ -60,7 +60,7 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         for (int i = 0; i < children.getLength(); i++) {
             Element e = (Element) children.item(i);
             PepRequestAttribute a = new PepRequestAttribute(e);
-            this.add(a);
+            add(a);
         }
     }
 
