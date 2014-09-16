@@ -62,7 +62,9 @@ public class Server implements Runnable {
         // start server 
         webServer.start();
         // start heartbeat
-        (new Thread(this)).start();
+        Thread thread = new Thread(this);
+        thread.setName(getClass().getSimpleName()+".watchdog");
+        thread.start();
     }
 
     protected void watchdog() {

@@ -69,12 +69,12 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         // TODO inefficient implementation
         for(PepRequestAttribute a: this) {
             if(a.category.equals(attribute.category) && a.id.equals(attribute.id)) {
-                log.warn("already present, removing "+attribute);
+                log.debug("already present, removing "+attribute);
                 super.remove(a);
                 break;
             }
         }
-        log.info("adding "+attribute);
+        log.debug("adding "+attribute);
         return super.add(attribute);
     }
     

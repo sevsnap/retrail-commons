@@ -12,9 +12,9 @@ import org.wso2.balana.utils.Constants.PolicyConstants;
  */
 public class PepRequestAttribute {
 
-    public final String id, type, value, issuer, category;
+    public final String id, type, issuer, category, factory;
+    public String value;
     public Date expires;
-    public String factory;
     
     public static class CATEGORIES {
         static final public String SUBJECT = PolicyConstants.SUBJECT_CATEGORY_URI;
@@ -74,6 +74,16 @@ public class PepRequestAttribute {
         this.value = value;
         this.issuer = issuer;
         this.category = category;
+        this.factory = null;
+    }
+    
+    public PepRequestAttribute(String id, String type, String value, String issuer, String category, String factory) {
+        this.id = id;
+        this.type = type;
+        this.value = value;
+        this.issuer = issuer;
+        this.category = category;
+        this.factory = factory;
     }
 
     public PepRequestAttribute(Element attributeElement) {
@@ -85,10 +95,11 @@ public class PepRequestAttribute {
         Element attributeValue = (Element) attributeElement.getElementsByTagName(PolicyConstants.ATTRIBUTE_VALUE).item(0);
         type = attributeValue.getAttribute(PolicyConstants.DATA_TYPE);
         value = attributeValue.getTextContent();
+        factory = null;
     }
 
     public String toString() {
-        return "PepRequestAttribute [id="+id+", value="+value+"]";
+        return "PepRequestAttribute [id="+id+", value="+value+", factory="+factory+"]";
     }
 
 }
