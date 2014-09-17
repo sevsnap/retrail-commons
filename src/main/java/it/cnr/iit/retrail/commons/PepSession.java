@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
  */
 public class PepSession extends PepAccessResponse {
     
-    private String systemId, customId;
+    private String uuid, customId;
     private URL uconUrl;
     
     public enum Status {
@@ -34,12 +34,12 @@ public class PepSession extends PepAccessResponse {
         super(DomUtils.read("<Response><Result><Decision>"+decisionEnum.name()+"</Decision><StatusMessage>"+statusMessage+"</StatusMessage></Result></Response>"));
     }
 
-    public String getSystemId() {
-        return systemId;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setSystemId(String systemId) {
-        this.systemId = systemId;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getCustomId() {
@@ -70,7 +70,7 @@ public class PepSession extends PepAccessResponse {
         super(doc);
         Element session = (Element) element.getElementsByTagName("Session").item(0);
         if (session != null) {
-            this.systemId = session.getAttributeNS(null, "systemId");
+            this.uuid = session.getAttributeNS(null, "uuid");
             this.customId = session.getAttributeNS(null, "customId");
             String urlString = session.getAttributeNS(null, "uconUrl");
             this.uconUrl = urlString == null? null : new URL(urlString);
@@ -79,11 +79,11 @@ public class PepSession extends PepAccessResponse {
 
     public void addSessionElement(String id, String cookie, Status status, URL url) {
         Element session = element.getOwnerDocument().createElementNS(null, "Session");
-        session.setAttributeNS(null, "systemId", id);
+        session.setAttributeNS(null, "uuid", id);
         session.setAttributeNS(null, "customId", cookie);
         session.setAttributeNS(null, "uconUrl", url.toString());
         session.setAttributeNS(null, "status", status.toString());
-        this.systemId = id;
+        this.uuid = id;
         this.customId = cookie;
         this.status = status;
         this.uconUrl = url;
@@ -92,12 +92,12 @@ public class PepSession extends PepAccessResponse {
     
     @Override
     public String toString() {
-        return "PepSession [systemId="+systemId+", customId="+customId+", decision="+decision+", message="+message+", uconUrl="+uconUrl+"]";
+        return "PepSession [uuid="+uuid+", customId="+customId+", decision="+decision+", message="+message+", uconUrl="+uconUrl+"]";
     }
     
     @Override
     public int hashCode() {
-        int hash = systemId.hashCode();
+        int hash = uuid.hashCode();
         return hash;
     }
 
@@ -110,7 +110,7 @@ public class PepSession extends PepAccessResponse {
             return false;
         }
         final PepSession other = (PepSession) obj;
-        if (!Objects.equals(this.systemId, other.systemId)) {
+        if (!Objects.equals(this.uuid, other.uuid)) {
             return false;
         }
         return true;
