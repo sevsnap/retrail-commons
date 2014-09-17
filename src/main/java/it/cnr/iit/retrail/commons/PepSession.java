@@ -7,6 +7,8 @@
 package it.cnr.iit.retrail.commons;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Objects;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
@@ -19,32 +21,33 @@ import org.xml.sax.SAXException;
  */
 public class PepSession extends PepAccessResponse {
     
-    private String id, cookie;
+    private String systemId, customId;
+    private URL uconUrl;
     
     public enum Status {
         TRY, ONGOING, REVOKED
     }
     
-    Status status = Status.TRY;
+    private Status status = Status.TRY;
 
     public PepSession(DecisionEnum decisionEnum, String statusMessage) throws ParserConfigurationException, SAXException, IOException {   
         super(DomUtils.read("<Response><Result><Decision>"+decisionEnum.name()+"</Decision><StatusMessage>"+statusMessage+"</StatusMessage></Result></Response>"));
     }
 
-    public String getId() {
-        return id;
+    public String getSystemId() {
+        return systemId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setSystemId(String systemId) {
+        this.systemId = systemId;
     }
 
-    public String getCookie() {
-        return cookie;
+    public String getCustomId() {
+        return customId;
     }
 
-    public void setCookie(String cookie) {
-        this.cookie = cookie;
+    public void setCustomId(String customId) {
+        this.customId = customId;
     }
 
     public Status getStatus() {
@@ -55,34 +58,46 @@ public class PepSession extends PepAccessResponse {
         this.status = status;
     }
 
-    public PepSession(Document doc) {
+    public URL getUconUrl() {
+        return uconUrl;
+    }
+
+    public void setUconUrl(URL uconUrl) {
+        this.uconUrl = uconUrl;
+    }
+
+    public PepSession(Document doc) throws MalformedURLException {
         super(doc);
         Element session = (Element) element.getElementsByTagName("Session").item(0);
         if (session != null) {
-            this.id = session.getAttributeNS(null, "id");
-            this.cookie = session.getAttributeNS(null, "cookie");
+            this.systemId = session.getAttributeNS(null, "systemId");
+            this.customId = session.getAttributeNS(null, "customId");
+            String urlString = session.getAttributeNS(null, "uconUrl");
+            this.uconUrl = urlString == null? null : new URL(urlString);
         } 
     }
 
-    public void addSession(String id, String cookie, Status status) {
+    public void addSessionElement(String id, String cookie, Status status, URL url) {
         Element session = element.getOwnerDocument().createElementNS(null, "Session");
-        session.setAttributeNS(null, "id", id);
-        session.setAttributeNS(null, "cookie", cookie);
+        session.setAttributeNS(null, "systemId", id);
+        session.setAttributeNS(null, "customId", cookie);
+        session.setAttributeNS(null, "uconUrl", url.toString());
         session.setAttributeNS(null, "status", status.toString());
-        this.id = id;
-        this.cookie = cookie;
+        this.systemId = id;
+        this.customId = cookie;
         this.status = status;
+        this.uconUrl = url;
         element.appendChild(session);
     }
     
     @Override
     public String toString() {
-        return "PepSession [id="+id+", cookie="+cookie+", decision="+decision+", message="+message+"]";
+        return "PepSession [systemId="+systemId+", customId="+customId+", decision="+decision+", message="+message+", uconUrl="+uconUrl+"]";
     }
     
     @Override
     public int hashCode() {
-        int hash = id.hashCode();
+        int hash = systemId.hashCode();
         return hash;
     }
 
@@ -95,7 +110,7 @@ public class PepSession extends PepAccessResponse {
             return false;
         }
         final PepSession other = (PepSession) obj;
-        if (!Objects.equals(this.id, other.id)) {
+        if (!Objects.equals(this.systemId, other.systemId)) {
             return false;
         }
         return true;
