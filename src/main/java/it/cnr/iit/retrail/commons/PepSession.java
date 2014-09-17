@@ -25,10 +25,10 @@ public class PepSession extends PepAccessResponse {
     private URL uconUrl;
     
     public enum Status {
-        TRY, ONGOING, REVOKED
+        UNKNOWN, TRY, ONGOING, REVOKED, DELETED
     }
     
-    private Status status = Status.TRY;
+    private Status status = Status.UNKNOWN;
 
     public PepSession(DecisionEnum decisionEnum, String statusMessage) throws ParserConfigurationException, SAXException, IOException {   
         super(DomUtils.read("<Response><Result><Decision>"+decisionEnum.name()+"</Decision><StatusMessage>"+statusMessage+"</StatusMessage></Result></Response>"));
@@ -72,19 +72,20 @@ public class PepSession extends PepAccessResponse {
         if (session != null) {
             this.uuid = session.getAttributeNS(null, "uuid");
             this.customId = session.getAttributeNS(null, "customId");
+            this.status = Status.valueOf(session.getAttributeNS(null, "status"));
             String urlString = session.getAttributeNS(null, "uconUrl");
             this.uconUrl = urlString == null? null : new URL(urlString);
         } 
     }
 
-    public void addSessionElement(String id, String cookie, Status status, URL url) {
+    public void addSessionElement(String uuid, String customId, Status status, URL url) {
         Element session = element.getOwnerDocument().createElementNS(null, "Session");
-        session.setAttributeNS(null, "uuid", id);
-        session.setAttributeNS(null, "customId", cookie);
+        session.setAttributeNS(null, "uuid", uuid);
+        session.setAttributeNS(null, "customId", customId);
         session.setAttributeNS(null, "uconUrl", url.toString());
         session.setAttributeNS(null, "status", status.toString());
-        this.uuid = id;
-        this.customId = cookie;
+        this.uuid = uuid;
+        this.customId = customId;
         this.status = status;
         this.uconUrl = url;
         element.appendChild(session);
