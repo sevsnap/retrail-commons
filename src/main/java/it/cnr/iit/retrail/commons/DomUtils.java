@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -43,14 +44,19 @@ public class DomUtils {
             StreamResult result = new StreamResult(out);
             transformer.transform(source, result);
     }
-    
-    public static void write(Node n) {
+        
+    public static String toString(Node n) {
+        String xml = null;
         try {
-            write(n, System.out);
-            System.out.println("");
+            
+            StringWriter writer = new StringWriter();
+           Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(n), new StreamResult(writer));
+            xml = writer.toString();
         } catch (TransformerException ex) {
             Logger.getLogger(DomUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return xml;
     }
     
     public static Document newDocument() throws ParserConfigurationException {

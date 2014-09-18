@@ -30,8 +30,9 @@ public class PepSession extends PepAccessResponse {
     
     private Status status = Status.UNKNOWN;
 
-    public PepSession(DecisionEnum decisionEnum, String statusMessage) throws ParserConfigurationException, SAXException, IOException {   
+    public PepSession(DecisionEnum decisionEnum, Status status, String statusMessage) throws ParserConfigurationException, SAXException, IOException {   
         super(DomUtils.read("<Response><Result><Decision>"+decisionEnum.name()+"</Decision><StatusMessage>"+statusMessage+"</StatusMessage></Result></Response>"));
+        this.status = status;
     }
 
     public String getUuid() {
@@ -83,7 +84,7 @@ public class PepSession extends PepAccessResponse {
         session.setAttributeNS(null, "uuid", uuid);
         session.setAttributeNS(null, "customId", customId);
         session.setAttributeNS(null, "uconUrl", url.toString());
-        session.setAttributeNS(null, "status", status.toString());
+        session.setAttributeNS(null, "status", status.name());
         this.uuid = uuid;
         this.customId = customId;
         this.status = status;
@@ -93,28 +94,17 @@ public class PepSession extends PepAccessResponse {
     
     @Override
     public String toString() {
-        return "PepSession [uuid="+uuid+", customId="+customId+", decision="+decision+", message="+message+", uconUrl="+uconUrl+"]";
-    }
-    
-    @Override
-    public int hashCode() {
-        int hash = uuid.hashCode();
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final PepSession other = (PepSession) obj;
-        if (!Objects.equals(this.uuid, other.uuid)) {
-            return false;
-        }
-        return true;
+        String s = "PepSession [uuid="+uuid;
+        if(customId != null && !customId.equals(uuid))
+            s += ", customId="+customId;
+        s += ", decision="+decision;
+        if(message != null && message.length() > 0)
+            s += ", message="+message;
+        s += ", status="+status;
+        if(uconUrl != null)
+            s += ", uconUrl="+uconUrl;
+        s += "]";
+        return s;
     }
 
 }
