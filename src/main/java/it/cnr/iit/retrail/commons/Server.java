@@ -33,20 +33,29 @@ public class Server implements Runnable {
      * @throws java.net.UnknownHostException
      * @throws org.apache.xmlrpc.XmlRpcException
      */
-    public Server(URL myUrl, Class APIClass) throws UnknownHostException, XmlRpcException {  
+    public Server(URL myUrl, Class APIClass) throws UnknownHostException, XmlRpcException {
         this.myUrl = myUrl;
+        this.webServer = createWebServer(myUrl, APIClass, getClass().getSimpleName());
+    }
+    
+    public Server(URL myUrl, Class APIClass, String namespace) throws UnknownHostException, XmlRpcException {
+        this.myUrl = myUrl;
+        webServer = createWebServer(myUrl, APIClass, namespace);
+    }
+    
+    private WebServer createWebServer(URL myUrl, Class APIClass, String namespace) throws UnknownHostException, XmlRpcException {
         InetAddress address = java.net.InetAddress.getByName(myUrl.getHost());
         int port = myUrl.getPort();
         if(port == -1)
             port = myUrl.getDefaultPort();
         if(port == -1)
             port = 80;
-        webServer = new WebServer(port, address);
-        XmlRpcServer server = webServer.getXmlRpcServer();
+        WebServer wServer = new WebServer(port, address);
+        XmlRpcServer server = wServer.getXmlRpcServer();
         PropertyHandlerMapping phm;
         phm = new PropertyHandlerMapping();
-        log.info("class: "+getClass().getSimpleName()+", api: "+APIClass);
-        phm.addHandler(getClass().getSimpleName(), APIClass);
+        log.info("class: "+namespace+", api: "+APIClass);
+        phm.addHandler(namespace, APIClass);
         server.setHandlerMapping(phm);
 
         XmlRpcServerConfigImpl serverConfig
@@ -56,8 +65,9 @@ public class Server implements Runnable {
         log.info("available xmlrpc methods:");
         for(String method: phm.getListMethods()) 
             log.info(method);
+        return wServer;
     }
-
+    
     public void init() throws IOException  {
         // start server 
         webServer.start();
