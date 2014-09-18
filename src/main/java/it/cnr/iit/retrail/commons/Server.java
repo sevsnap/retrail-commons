@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class Server implements Runnable {
     public static final int watchdogPeriod = 15;
+    private Thread watchdogThread;
     
     public final URL myUrl;
     private final WebServer webServer;
@@ -72,16 +73,21 @@ public class Server implements Runnable {
         // start server 
         webServer.start();
         // start heartbeat
-        Thread thread = new Thread(this);
-        thread.setName(getClass().getSimpleName()+".watchdog");
-        thread.start();
+        watchdogThread = new Thread(this);
+        watchdogThread.setName(getClass().getSimpleName()+".watchdog");
+        watchdogThread.start();
+    }
+    
+    public void term() throws InterruptedException {
+        webServer.shutdown();
+        watchdogThread.interrupt();
+        watchdogThread.join();
     }
 
-    protected void watchdog() {
+    protected void watchdog() throws InterruptedException {
         log.info("Server.heartbeat(): idle call");
     }
     
-
     @Override
     public void run() {
         // heartbeat
@@ -90,7 +96,7 @@ public class Server implements Runnable {
                 watchdog();
                 Thread.sleep(watchdogPeriod * 1000);
             } catch (InterruptedException ex) {
-                log.error("unexpected exception: {}", ex);
+                log.error("interrupting {}", Thread.currentThread());
                 return;
             }
         }
