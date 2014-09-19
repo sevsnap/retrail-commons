@@ -30,9 +30,8 @@ public class PepSession extends PepAccessResponse {
     
     private Status status = Status.UNKNOWN;
 
-    public PepSession(DecisionEnum decisionEnum, Status status, String statusMessage) throws ParserConfigurationException, SAXException, IOException {   
+    public PepSession(DecisionEnum decisionEnum, String statusMessage) throws ParserConfigurationException, SAXException, IOException {   
         super(DomUtils.read("<Response><Result><Decision>"+decisionEnum.name()+"</Decision><StatusMessage>"+statusMessage+"</StatusMessage></Result></Response>"));
-        this.status = status;
     }
 
     public String getUuid() {
@@ -79,17 +78,21 @@ public class PepSession extends PepAccessResponse {
         } 
     }
 
-    public void addSessionElement(String uuid, String customId, Status status, URL url) {
+    @Override
+    public Element toElement() {
+        Element root = super.toElement();
         Element session = element.getOwnerDocument().createElementNS(null, "Session");
-        session.setAttributeNS(null, "uuid", uuid);
-        session.setAttributeNS(null, "customId", customId);
-        session.setAttributeNS(null, "uconUrl", url.toString());
-        session.setAttributeNS(null, "status", status.name());
-        this.uuid = uuid;
-        this.customId = customId;
-        this.status = status;
-        this.uconUrl = url;
-        element.appendChild(session);
+        if(uuid != null)
+            session.setAttributeNS(null, "uuid", uuid);
+        if(customId != null)
+            session.setAttributeNS(null, "customId", customId);
+        if(uconUrl != null)
+            session.setAttributeNS(null, "uconUrl", uconUrl.toString());
+        if(status != null)
+            session.setAttributeNS(null, "status", status.name());
+        if(session.hasAttributes())
+            root.appendChild(session);
+        return root;
     }
     
     @Override
