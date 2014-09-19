@@ -74,7 +74,7 @@ public class PepSession extends PepAccessResponse {
             this.customId = session.getAttributeNS(null, "customId");
             this.status = Status.valueOf(session.getAttributeNS(null, "status"));
             String urlString = session.getAttributeNS(null, "uconUrl");
-            this.uconUrl = urlString == null? null : new URL(urlString);
+            this.uconUrl = urlString.length() == 0? null : new URL(urlString);
         } 
     }
 
