@@ -40,7 +40,7 @@ public class DomUtils {
             StreamResult result = new StreamResult(out);
             transformer.transform(source, result);
     }
-        
+    
     public static String toString(Node n) {
         String xml = null;
         try {
