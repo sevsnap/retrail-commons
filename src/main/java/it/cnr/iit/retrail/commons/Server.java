@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServer;
@@ -76,6 +77,14 @@ public class Server implements Runnable {
         watchdogThread = new Thread(this);
         watchdogThread.setName(getClass().getSimpleName()+".watchdog");
         watchdogThread.start();
+    }
+    
+    public void forever() {
+        try {
+            watchdogThread.join();
+        } catch (InterruptedException ex) {
+            log.warn("exiting");
+        }
     }
     
     public void term() throws InterruptedException {
