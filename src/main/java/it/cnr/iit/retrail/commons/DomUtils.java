@@ -6,13 +6,9 @@
 
 package it.cnr.iit.retrail.commons;
 
-import com.sun.org.apache.xerces.internal.dom.DOMOutputImpl;
-import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -16,11 +16,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.balana.XACMLConstants;
 import org.wso2.balana.utils.Constants.PolicyConstants;
 import org.wso2.balana.utils.PolicyUtils;
 
