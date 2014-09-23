@@ -20,13 +20,12 @@ public class PepAccessResponse {
     private static final Log log = LogFactory.getLog(PepAccessRequest.class);
     protected final Element element;
 
-    public String message = "";
-
     public enum DecisionEnum {
         Indeterminate, NotApplicable, Deny, Permit
     };
 
-    public DecisionEnum decision = DecisionEnum.Indeterminate;
+    protected DecisionEnum decision = DecisionEnum.Indeterminate;
+    protected String message = "";
 
     public PepAccessResponse(Document doc) {
         element = (Element) doc.getElementsByTagName("Response").item(0);
@@ -35,6 +34,22 @@ public class PepAccessResponse {
         NodeList statusMessages = element.getElementsByTagName("StatusMessage");
         if (statusMessages.getLength() > 0) 
             message = statusMessages.item(0).getTextContent();
+    }
+
+    public DecisionEnum getDecision() {
+        return decision;
+    }
+
+    public void setDecision(DecisionEnum decision) {
+        this.decision = decision;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public Element toElement() {
