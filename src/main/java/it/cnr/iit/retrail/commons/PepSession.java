@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package it.cnr.iit.retrail.commons;
 
 import java.io.IOException;
@@ -20,18 +19,19 @@ import org.xml.sax.SAXException;
  * @author oneadmin
  */
 public class PepSession extends PepAccessResponse {
-    
+
     private String uuid, customId;
     private URL uconUrl;
-    
+
     public enum Status {
-        UNKNOWN, TRY, ONGOING, REVOKED, DELETED
+
+        UNKNOWN, TRY, ONGOING, REVOKED, DELETED, REJECTED
     }
-    
+
     private Status status = Status.UNKNOWN;
 
-    public PepSession(DecisionEnum decisionEnum, String statusMessage) throws ParserConfigurationException, SAXException, IOException {   
-        super(DomUtils.read("<Response><Result><Decision>"+decisionEnum.name()+"</Decision><StatusMessage>"+statusMessage+"</StatusMessage></Result></Response>"));
+    public PepSession(DecisionEnum decisionEnum, String statusMessage) throws ParserConfigurationException, SAXException, IOException {
+        super(DomUtils.read("<Response><Result><Decision>" + decisionEnum.name() + "</Decision><StatusMessage>" + statusMessage + "</StatusMessage></Result></Response>"));
     }
 
     public String getUuid() {
@@ -74,38 +74,46 @@ public class PepSession extends PepAccessResponse {
             this.customId = session.getAttributeNS(null, "customId");
             this.status = Status.valueOf(session.getAttributeNS(null, "status"));
             String urlString = session.getAttributeNS(null, "uconUrl");
-            this.uconUrl = urlString.length() == 0? null : new URL(urlString);
-        } 
+            this.uconUrl = urlString.length() == 0 ? null : new URL(urlString);
+        }
     }
 
     @Override
     public Element toElement() {
         Element root = super.toElement();
         Element session = element.getOwnerDocument().createElementNS(null, "Session");
-        if(uuid != null)
+        if (uuid != null) {
             session.setAttributeNS(null, "uuid", uuid);
-        if(customId != null)
+        }
+        if (customId != null) {
             session.setAttributeNS(null, "customId", customId);
-        if(uconUrl != null)
+        }
+        if (uconUrl != null) {
             session.setAttributeNS(null, "uconUrl", uconUrl.toString());
-        if(status != null)
+        }
+        if (status != null) {
             session.setAttributeNS(null, "status", status.name());
-        if(session.hasAttributes())
+        }
+        if (session.hasAttributes()) {
             root.appendChild(session);
+        }
         return root;
     }
-    
+
     @Override
     public String toString() {
-        String s = "PepSession [uuid="+uuid;
-        if(customId != null && !customId.equals(uuid))
-            s += ", customId="+customId;
-        s += ", decision="+decision;
-        if(message != null && message.length() > 0)
-            s += ", message="+message;
-        s += ", status="+status;
-        if(uconUrl != null)
-            s += ", uconUrl="+uconUrl;
+        String s = "PepSession [uuid=" + uuid;
+        if (customId != null && !customId.equals(uuid)) {
+            s += ", customId=" + customId;
+        }
+        s += ", decision=" + decision;
+        if (message != null && message.length() > 0) {
+            s += ", message=" + message;
+        }
+        s += ", status=" + status;
+        if (uconUrl != null) {
+            s += ", uconUrl=" + uconUrl;
+        }
         s += "]";
         return s;
     }
