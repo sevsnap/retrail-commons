@@ -52,7 +52,7 @@ public class PepAccessResponse {
         this.message = message;
     }
 
-    public Element toElement() {
+    public Element toXacml3Element() {
         return element;
     }
 }

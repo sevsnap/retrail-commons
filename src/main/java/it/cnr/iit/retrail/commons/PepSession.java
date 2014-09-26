@@ -79,8 +79,8 @@ public class PepSession extends PepAccessResponse {
     }
 
     @Override
-    public Element toElement() {
-        Element root = super.toElement();
+    public Element toXacml3Element() {
+        Element root = super.toXacml3Element();
         Element session = element.getOwnerDocument().createElementNS(null, "Session");
         if (uuid != null) {
             session.setAttributeNS(null, "uuid", uuid);
