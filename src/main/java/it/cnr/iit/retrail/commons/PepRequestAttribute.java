@@ -17,6 +17,7 @@ public class PepRequestAttribute {
 
     public final String id, type, issuer, category, factory;
     public String value;
+    public boolean shared;
     public Date expires;
     
     public static class CATEGORIES {
@@ -78,6 +79,7 @@ public class PepRequestAttribute {
         this.issuer = issuer;
         this.category = category;
         this.factory = null;
+        this.shared = true;
     }
     
     public PepRequestAttribute(String id, String type, String value, String issuer, String category, String factory) {
@@ -87,6 +89,7 @@ public class PepRequestAttribute {
         this.issuer = issuer;
         this.category = category;
         this.factory = factory;
+        this.shared = true;
     }
 
     public PepRequestAttribute(Element attributeElement) {
@@ -99,8 +102,9 @@ public class PepRequestAttribute {
         type = attributeValue.getAttribute(PolicyConstants.DATA_TYPE);
         value = attributeValue.getTextContent();
         factory = null;
+        shared = true;
     }
-
+    
     public String toString() {
         return "PepRequestAttribute [id="+id+", value="+value+", factory="+factory+"]";
     }
