@@ -69,7 +69,7 @@ public class Server implements Runnable {
         return wServer;
     }
     
-    public void init() throws IOException  {
+    public void init() throws Exception  {
         // start server 
         webServer.start();
         // start heartbeat
@@ -104,7 +104,7 @@ public class Server implements Runnable {
                 watchdog();
                 Thread.sleep(watchdogPeriod * 1000);
             } catch (InterruptedException ex) {
-                log.error("interrupting {}", Thread.currentThread());
+                log.warn("{} interrupted -- exiting", Thread.currentThread());
                 return;
             }
         }
