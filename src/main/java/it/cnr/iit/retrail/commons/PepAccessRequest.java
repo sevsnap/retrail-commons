@@ -97,6 +97,14 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         return categories.get(category);
     }
     
+    public PepRequestAttribute getAttribute(String category, String id) {
+        Collection<PepRequestAttribute> c = categories.get(category);
+        if(c != null)
+            for(PepRequestAttribute a: c)
+                return a;
+        return null;
+    }
+    
     public Element toElement() throws Exception {
         // we now build the request, using balana as much as possible.
         RequestElementDTO requestElementDTO = new RequestElementDTO();
