@@ -7,6 +7,7 @@ package it.cnr.iit.retrail.commons;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.wso2.balana.utils.policy.dto.RequestElementDTO;
 public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
     // Attributes may be overwritten (they are simply replaced).
     protected static final Logger log = LoggerFactory.getLogger(PepAccessRequest.class);
+    private final Map<String, Collection<PepRequestAttribute>> categories;
     
     public static PepAccessRequest newInstance(String subject, String action, String resourceUrl, String issuer) {
         PepAccessRequest request = new PepAccessRequest();
@@ -47,10 +49,12 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
 
     public PepAccessRequest() {
         super();
+        categories = new HashMap<>();
     }
 
     public PepAccessRequest(Document doc) {
         super();
+        categories = new HashMap<>();
         Element req;
         req = (Element) doc.getElementsByTagName(PolicyConstants.Request.REQUEST_ELEMENT).item(0);
         NodeList children = req.getElementsByTagName(PolicyConstants.ATTRIBUTE);
@@ -62,16 +66,25 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
     }
 
     @Override
-    public boolean add(PepRequestAttribute attribute) {
-        // TODO inefficient implementation
-        for(PepRequestAttribute a: this) {
-            if(a.category.equals(attribute.category) && a.id.equals(attribute.id)) {
+    public final boolean add(PepRequestAttribute attribute) {
+        // Since XACML 3.0 organizes categories in <Attributes> blocks, 
+        // we group the simple list of attributes in a map by category.
+
+        Collection<PepRequestAttribute> categoryList = categories.get(attribute.category);
+        if (categoryList == null) {
+            categoryList = new ArrayList<>();
+            categories.put(attribute.category, categoryList);
+        }
+        for(PepRequestAttribute a: categoryList) {
+            if(a.id.equals(attribute.id)) {
                 log.debug("already present, removing "+attribute);
+                categoryList.remove(a);
                 super.remove(a);
                 break;
             }
         }
         log.debug("adding "+attribute);
+        categoryList.add(attribute);
         return super.add(attribute);
     }
     
@@ -80,25 +93,11 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         throw new UnsupportedOperationException("attribute removal is not allowed");
     }
     
-    public Map<String, List<PepRequestAttribute>> getCategories() {
-        // Since XACML 3.0 organizes categories in <Attributes> blocks, 
-        // we group the simple list of attributes in a map by category.
-        Map<String, List<PepRequestAttribute>> categories = new HashMap<>();
-        for (PepRequestAttribute entry : this) {
-            List<PepRequestAttribute> categoryList = categories.get(entry.category);
-            if (categoryList == null) {
-                categoryList = new ArrayList<>();
-                categories.put(entry.category, categoryList);
-            }
-            categoryList.add(entry);
-        }
-        return categories;
+    public Collection<PepRequestAttribute> getCategory(String category) {
+        return categories.get(category);
     }
     
     public Element toElement() throws Exception {
-        // Since XACML 3.0 organizes categories in <Attributes> blocks, 
-        // we group the simple list of attributes in a map by category.
-        Map<String, List<PepRequestAttribute>> categories = getCategories();
         // we now build the request, using balana as much as possible.
         RequestElementDTO requestElementDTO = new RequestElementDTO();
            
