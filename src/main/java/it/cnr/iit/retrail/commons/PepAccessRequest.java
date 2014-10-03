@@ -101,7 +101,8 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         Collection<PepRequestAttribute> c = categories.get(category);
         if(c != null)
             for(PepRequestAttribute a: c)
-                return a;
+                if(id.equals(a.id) && category.equals(a.category))
+                    return a;
         return null;
     }
     
