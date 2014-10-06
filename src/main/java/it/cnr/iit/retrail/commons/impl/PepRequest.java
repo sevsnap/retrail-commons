@@ -32,7 +32,9 @@ import org.wso2.balana.utils.policy.dto.RequestElementDTO;
  *
  * @author oneadmin
  */
-public class PepRequest extends ArrayList<PepAttributeInterface> implements PepRequestInterface {
+public class PepRequest 
+extends ArrayList<PepAttributeInterface> 
+implements PepRequestInterface {
     // Attributes may be overwritten (they are simply replaced).
     protected static final Logger log = LoggerFactory.getLogger(PepRequest.class);
     private final Map<String, Collection<PepAttributeInterface>> categories;
@@ -49,6 +51,10 @@ public class PepRequest extends ArrayList<PepAttributeInterface> implements PepR
         return request;
     }
 
+    protected static PepAttributeInterface newAttribute(Element e) {
+        return new PepAttribute(e);
+    }
+    
     public PepRequest() {
         super();
         categories = new HashMap<>();
@@ -62,7 +68,7 @@ public class PepRequest extends ArrayList<PepAttributeInterface> implements PepR
         NodeList children = req.getElementsByTagName(PolicyConstants.ATTRIBUTE);
         for (int i = 0; i < children.getLength(); i++) {
             Element e = (Element) children.item(i);
-            PepAttribute a = new PepAttribute(e);
+            PepAttributeInterface a = PepRequest.newAttribute(e);
             add(a);
         }
     }
