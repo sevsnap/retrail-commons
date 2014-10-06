@@ -3,7 +3,7 @@
  * Coded by: 2014 Enrico "KMcC;) Carniani
  */
 
-package it.cnr.iit.retrail.commons;
+package it.cnr.iit.retrail.commons.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,9 +15,9 @@ import org.w3c.dom.NodeList;
  *
  * @author oneadmin
  */
-public class PepAccessResponse {
+public class PepResponse {
 
-    private static final Log log = LogFactory.getLog(PepAccessRequest.class);
+    private static final Log log = LogFactory.getLog(PepRequest.class);
     protected final Element element;
 
     public enum DecisionEnum {
@@ -27,7 +27,7 @@ public class PepAccessResponse {
     protected DecisionEnum decision = DecisionEnum.Indeterminate;
     protected String message = "";
 
-    public PepAccessResponse(Document doc) {
+    public PepResponse(Document doc) {
         element = (Element) doc.getElementsByTagName("Response").item(0);
         String decisionString = element.getElementsByTagName("Decision").item(0).getTextContent();
         decision = DecisionEnum.valueOf(decisionString);

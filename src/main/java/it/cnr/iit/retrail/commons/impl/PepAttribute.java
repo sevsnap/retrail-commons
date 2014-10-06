@@ -3,8 +3,9 @@
  * Coded by: 2014 Enrico "KMcC;) Carniani
  */
 
-package it.cnr.iit.retrail.commons;
+package it.cnr.iit.retrail.commons.impl;
 
+import it.cnr.iit.retrail.commons.PepAttributeInterface;
 import java.util.Date;
 import org.w3c.dom.Element;
 import org.wso2.balana.utils.Constants.PolicyConstants;
@@ -13,12 +14,12 @@ import org.wso2.balana.utils.Constants.PolicyConstants;
  *
  * @author oneadmin
  */
-public class PepRequestAttribute {
+public class PepAttribute implements PepAttributeInterface {
 
-    public final String id, type, issuer, category, factory;
-    public String value;
-    public PepRequestAttribute parent;
-    public Date expires;
+    private final String id, type, issuer, category, factory;
+    private String value;
+    private PepAttribute parent;
+    private Date expires;
     
     public static class CATEGORIES {
         static final public String SUBJECT = PolicyConstants.SUBJECT_CATEGORY_URI;
@@ -40,39 +41,39 @@ public class PepRequestAttribute {
         static final public String EMAIL = PolicyConstants.DataType.STRING;   //FIXME
     }
     
-    public static PepRequestAttribute newSubject(String subject, String issuer) {
-        return new PepRequestAttribute(IDS.SUBJECT, 
+    public static PepAttribute newSubject(String subject, String issuer) {
+        return new PepAttribute(IDS.SUBJECT, 
                                        DATATYPES.STRING, 
                                        subject, 
                                        issuer,
-                                       PepRequestAttribute.CATEGORIES.SUBJECT);
+                                       PepAttribute.CATEGORIES.SUBJECT);
     }
     
-    public static PepRequestAttribute newEmailSubject(String email, String issuer) {
-        return new PepRequestAttribute(IDS.SUBJECT, 
+    public static PepAttribute newEmailSubject(String email, String issuer) {
+        return new PepAttribute(IDS.SUBJECT, 
                                        DATATYPES.EMAIL, 
                                        email, 
                                        issuer,
-                                       PepRequestAttribute.CATEGORIES.SUBJECT);
+                                       PepAttribute.CATEGORIES.SUBJECT);
     }
     
-    public static PepRequestAttribute newAction(String action, String issuer) {
-        return new PepRequestAttribute(IDS.ACTION, 
+    public static PepAttribute newAction(String action, String issuer) {
+        return new PepAttribute(IDS.ACTION, 
                                        DATATYPES.STRING, 
                                        action, 
                                        issuer,
-                                       PepRequestAttribute.CATEGORIES.ACTION);
+                                       PepAttribute.CATEGORIES.ACTION);
     }
     
-    public static PepRequestAttribute newResource(String resource, String issuer) {
-        return new PepRequestAttribute(IDS.RESOURCE, 
+    public static PepAttribute newResource(String resource, String issuer) {
+        return new PepAttribute(IDS.RESOURCE, 
                                        DATATYPES.URI, 
                                        resource, 
                                        issuer,
-                                       PepRequestAttribute.CATEGORIES.RESOURCE);
+                                       PepAttribute.CATEGORIES.RESOURCE);
     }
     
-    public PepRequestAttribute(String id, String type, String value, String issuer, String category) {
+    public PepAttribute(String id, String type, String value, String issuer, String category) {
         this.id = id;
         this.type = type;
         this.value = value;
@@ -82,7 +83,7 @@ public class PepRequestAttribute {
         this.parent = null;
     }
     
-    public PepRequestAttribute(String id, String type, String value, String issuer, String category, String factory) {
+    public PepAttribute(String id, String type, String value, String issuer, String category, String factory) {
         this.id = id;
         this.type = type;
         this.value = value;
@@ -92,7 +93,7 @@ public class PepRequestAttribute {
         this.parent = null;
     }
 
-    public PepRequestAttribute(Element attributeElement) {
+    public PepAttribute(Element attributeElement) {
         // XACML 3.0 format
         Element rootElement = (Element) attributeElement.getParentNode();
         category = rootElement.getAttribute(PolicyConstants.CATEGORY);
@@ -104,6 +105,63 @@ public class PepRequestAttribute {
         factory = null;
         parent = null;
     }
+
+    @Override
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public PepAttribute getParent() {
+        return parent;
+    }
+
+    @Override
+    public void setParent(PepAttributeInterface parent) {
+        this.parent = (PepAttribute) parent;
+    }
+
+    @Override
+    public Date getExpires() {
+        return expires;
+    }
+
+    @Override
+    public void setExpires(Date expires) {
+        this.expires = expires;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public String getIssuer() {
+        return issuer;
+    }
+
+    @Override
+    public String getCategory() {
+        return category;
+    }
+
+    @Override
+    public String getFactory() {
+        return factory;
+    }
+    
+    
     
     public String toString() {
         return "PepRequestAttribute [id="+id+", value="+value+", factory="+factory+"]";

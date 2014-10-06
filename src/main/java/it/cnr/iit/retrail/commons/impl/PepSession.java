@@ -3,8 +3,11 @@
  * Coded by: 2014 Enrico "KMcC;) Carniani
  */
 
-package it.cnr.iit.retrail.commons;
+package it.cnr.iit.retrail.commons.impl;
 
+import it.cnr.iit.retrail.commons.DomUtils;
+import it.cnr.iit.retrail.commons.PepSessionInterface;
+import it.cnr.iit.retrail.commons.Status;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,15 +20,11 @@ import org.xml.sax.SAXException;
  *
  * @author oneadmin
  */
-public class PepSession extends PepAccessResponse {
+public class PepSession extends PepResponse implements PepSessionInterface {
 
     private String uuid, customId;
     private URL uconUrl;
 
-    public enum Status {
-
-        UNKNOWN, TRY, ONGOING, REVOKED, DELETED, REJECTED
-    }
 
     private Status status = Status.UNKNOWN;
 
@@ -33,34 +32,42 @@ public class PepSession extends PepAccessResponse {
         super(DomUtils.read("<Response><Result><Decision>" + decisionEnum.name() + "</Decision><StatusMessage>" + statusMessage + "</StatusMessage></Result></Response>"));
     }
 
+    @Override
     public String getUuid() {
         return uuid;
     }
 
+    @Override
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
+    @Override
     public String getCustomId() {
         return customId;
     }
 
+    @Override
     public void setCustomId(String customId) {
         this.customId = customId;
     }
 
+    @Override
     public Status getStatus() {
         return status;
     }
 
+    @Override
     public void setStatus(Status status) {
         this.status = status;
     }
 
+    @Override
     public URL getUconUrl() {
         return uconUrl;
     }
 
+    @Override
     public void setUconUrl(URL uconUrl) {
         this.uconUrl = uconUrl;
     }

@@ -3,8 +3,10 @@
  * Coded by: 2014 Enrico "KMcC;) Carniani
  */
 
-package it.cnr.iit.retrail.commons;
+package it.cnr.iit.retrail.commons.impl;
 
+import it.cnr.iit.retrail.commons.PepAttributeInterface;
+import it.cnr.iit.retrail.commons.PepRequestInterface;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,29 +32,29 @@ import org.wso2.balana.utils.policy.dto.RequestElementDTO;
  *
  * @author oneadmin
  */
-public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
+public class PepRequest extends ArrayList<PepAttributeInterface> implements PepRequestInterface {
     // Attributes may be overwritten (they are simply replaced).
-    protected static final Logger log = LoggerFactory.getLogger(PepAccessRequest.class);
-    private final Map<String, Collection<PepRequestAttribute>> categories;
+    protected static final Logger log = LoggerFactory.getLogger(PepRequest.class);
+    private final Map<String, Collection<PepAttributeInterface>> categories;
     
-    public static PepAccessRequest newInstance(String subject, String action, String resourceUrl, String issuer) {
-        PepAccessRequest request = new PepAccessRequest();
-        PepRequestAttribute attribute;
-        attribute = PepRequestAttribute.newEmailSubject(subject, issuer);
+    public static PepRequest newInstance(String subject, String action, String resourceUrl, String issuer) {
+        PepRequest request = new PepRequest();
+        PepAttribute attribute;
+        attribute = PepAttribute.newEmailSubject(subject, issuer);
         request.add(attribute);
-        attribute = PepRequestAttribute.newAction(action, issuer);
+        attribute = PepAttribute.newAction(action, issuer);
         request.add(attribute);
-        attribute = PepRequestAttribute.newResource(resourceUrl, issuer);
+        attribute = PepAttribute.newResource(resourceUrl, issuer);
         request.add(attribute);
         return request;
     }
 
-    public PepAccessRequest() {
+    public PepRequest() {
         super();
         categories = new HashMap<>();
     }
 
-    public PepAccessRequest(Document doc) {
+    public PepRequest(Document doc) {
         super();
         categories = new HashMap<>();
         Element req;
@@ -60,23 +62,23 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         NodeList children = req.getElementsByTagName(PolicyConstants.ATTRIBUTE);
         for (int i = 0; i < children.getLength(); i++) {
             Element e = (Element) children.item(i);
-            PepRequestAttribute a = new PepRequestAttribute(e);
+            PepAttribute a = new PepAttribute(e);
             add(a);
         }
     }
 
     @Override
-    public final boolean add(PepRequestAttribute attribute) {
+    public final boolean add(PepAttributeInterface attribute) {
         // Since XACML 3.0 organizes categories in <Attributes> blocks, 
         // we group the simple list of attributes in a map by category.
 
-        Collection<PepRequestAttribute> categoryList = categories.get(attribute.category);
+        Collection<PepAttributeInterface> categoryList = categories.get(attribute.getCategory());
         if (categoryList == null) {
             categoryList = new ArrayList<>();
-            categories.put(attribute.category, categoryList);
+            categories.put(attribute.getCategory(), categoryList);
         }
-        for(PepRequestAttribute a: categoryList) {
-            if(a.id.equals(attribute.id)) {
+        for(PepAttributeInterface a: categoryList) {
+            if(a.getId().equals(attribute.getId())) {
                 log.debug("already present, removing "+attribute);
                 categoryList.remove(a);
                 super.remove(a);
@@ -93,19 +95,22 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
         throw new UnsupportedOperationException("attribute removal is not allowed");
     }
     
-    public Collection<PepRequestAttribute> getCategory(String category) {
+    @Override
+    public Collection<PepAttributeInterface> getCategory(String category) {
         return categories.get(category);
     }
     
-    public PepRequestAttribute getAttribute(String category, String id) {
-        Collection<PepRequestAttribute> c = categories.get(category);
+    @Override
+    public PepAttributeInterface getAttribute(String category, String id) {
+        Collection<PepAttributeInterface> c = categories.get(category);
         if(c != null)
-            for(PepRequestAttribute a: c)
-                if(id.equals(a.id) && category.equals(a.category))
+            for(PepAttributeInterface a: c)
+                if(id.equals(a.getId()) && category.equals(a.getCategory()))
                     return a;
         return null;
     }
     
+    @Override
     public Element toElement() throws Exception {
         // we now build the request, using balana as much as possible.
         RequestElementDTO requestElementDTO = new RequestElementDTO();
@@ -118,13 +123,13 @@ public class PepAccessRequest extends ArrayList<PepRequestAttribute> {
             AttributesElementDTO attributesElementDTO = new AttributesElementDTO();
             List<AttributeElementDTO> elementDTOs = new ArrayList<>();
             attributesElementDTO.setCategory(category);
-            for (PepRequestAttribute entry : categories.get(category)) {
+            for (PepAttributeInterface entry : categories.get(category)) {
                 AttributeElementDTO elementDTO = new AttributeElementDTO();
-                elementDTO.setAttributeId(entry.id);
-                elementDTO.setDataType(entry.type);
+                elementDTO.setAttributeId(entry.getId());
+                elementDTO.setDataType(entry.getType());
                 elementDTO.setIncludeInResult(false);
-                elementDTO.setIssuer(entry.issuer);
-                elementDTO.setAttributeValues(Arrays.asList(entry.value));
+                elementDTO.setIssuer(entry.getIssuer());
+                elementDTO.setAttributeValues(Arrays.asList(entry.getValue()));
                 elementDTOs.add(elementDTO);
             }
             attributesElementDTO.setAttributeElementDTOs(elementDTOs);
