@@ -11,10 +11,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.apache.commons.beanutils.BeanUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -55,6 +57,14 @@ implements PepRequestInterface {
         return new PepAttribute(e);
     }
     
+    protected static PepAttributeInterface newAttribute(String id, String type, String value, String issuer, String category, String factory) {
+        return new PepAttribute(id, type, value, issuer, category, factory);
+    }
+    
+    protected final static PepAttributeInterface newAttribute(PepAttributeInterface a) {
+        return newAttribute(a.getId(), a.getType(), a.getValue(), a.getIssuer(), a.getCategory(), a.getFactory());
+    }
+    
     public PepRequest() {
         super();
         categories = new HashMap<>();
@@ -70,6 +80,17 @@ implements PepRequestInterface {
             Element e = (Element) children.item(i);
             PepAttributeInterface a = PepRequest.newAttribute(e);
             add(a);
+        }
+    }
+    
+    public void copy(PepRequestInterface source) throws Exception {
+        categories.clear();
+        BeanUtils.copyProperties(this, source);
+        for(Iterator<PepAttributeInterface> i = this.iterator(); i.hasNext(); )
+            i.remove();
+        for(PepAttributeInterface a: source) {
+            PepAttributeInterface nA = PepRequest.newAttribute(a);
+            add(nA);
         }
     }
 

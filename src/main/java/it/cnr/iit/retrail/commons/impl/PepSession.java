@@ -28,6 +28,10 @@ public class PepSession extends PepResponse implements PepSessionInterface {
 
     private Status status = Status.UNKNOWN;
 
+    public PepSession() throws Exception {
+        super(DomUtils.read("<Response><Result><Decision>" + DecisionEnum.Permit.name() + "</Decision><StatusMessage></StatusMessage></Result></Response>"));
+    }
+    
     public PepSession(DecisionEnum decisionEnum, String statusMessage) throws ParserConfigurationException, SAXException, IOException {
         super(DomUtils.read("<Response><Result><Decision>" + decisionEnum.name() + "</Decision><StatusMessage>" + statusMessage + "</StatusMessage></Result></Response>"));
     }
@@ -72,33 +76,42 @@ public class PepSession extends PepResponse implements PepSessionInterface {
         this.uconUrl = uconUrl;
     }
 
-    public PepSession(Document doc) throws MalformedURLException {
+    public PepSession(Document doc) throws Exception {
         super(doc);
-        Element session = (Element) element.getElementsByTagName("Session").item(0);
-        if (session != null) {
-            this.uuid = session.getAttributeNS(null, "uuid");
-            this.customId = session.getAttributeNS(null, "customId");
-            this.status = Status.valueOf(session.getAttributeNS(null, "status"));
-            String urlString = session.getAttributeNS(null, "uconUrl");
-            this.uconUrl = urlString.length() == 0 ? null : new URL(urlString);
-        }
+        copy(doc);
     }
 
+    public final void copy(Document doc) throws Exception {
+        Element session = (Element) element.getElementsByTagName("Session").item(0);
+        if (session != null) {
+            setUuid(session.getAttributeNS(null, "uuid"));
+            setCustomId(session.getAttributeNS(null, "customId"));
+            setStatus(Status.valueOf(session.getAttributeNS(null, "status")));
+            String urlString = session.getAttributeNS(null, "uconUrl");
+            setUconUrl(urlString.length() == 0 ? null : new URL(urlString));
+        } else {
+            setUuid(null);
+            setCustomId(null);
+            setStatus(Status.UNKNOWN);
+            setUconUrl(null);            
+        }
+    }
+    
     @Override
     public Element toXacml3Element() {
         Element root = super.toXacml3Element();
         Element session = element.getOwnerDocument().createElementNS(null, "Session");
-        if (uuid != null) {
-            session.setAttributeNS(null, "uuid", uuid);
+        if (getUuid() != null) {
+            session.setAttributeNS(null, "uuid", getUuid());
         }
-        if (customId != null) {
-            session.setAttributeNS(null, "customId", customId);
+        if (getCustomId() != null) {
+            session.setAttributeNS(null, "customId", getCustomId());
         }
-        if (uconUrl != null) {
-            session.setAttributeNS(null, "uconUrl", uconUrl.toString());
+        if (getUconUrl() != null) {
+            session.setAttributeNS(null, "uconUrl", getUconUrl().toString());
         }
-        if (status != null) {
-            session.setAttributeNS(null, "status", status.name());
+        if (getStatus() != null) {
+            session.setAttributeNS(null, "status", getStatus().name());
         }
         if (session.hasAttributes()) {
             root.appendChild(session);
@@ -108,17 +121,17 @@ public class PepSession extends PepResponse implements PepSessionInterface {
 
     @Override
     public String toString() {
-        String s = "PepSession [uuid=" + uuid;
-        if (customId != null && !customId.equals(uuid)) {
-            s += ", customId=" + customId;
+        String s = getClass().getSimpleName()+" [uuid=" + getUuid();
+        if (getCustomId() != null && !getCustomId().equals(getUuid())) {
+            s += ", customId=" + getCustomId();
         }
-        s += ", decision=" + decision;
-        if (message != null && message.length() > 0) {
-            s += ", message=" + message;
+        s += ", decision=" + getDecision();
+        if (getMessage() != null && getMessage().length() > 0) {
+            s += ", message=" + getMessage();
         }
-        s += ", status=" + status;
-        if (uconUrl != null) {
-            s += ", uconUrl=" + uconUrl;
+        s += ", status=" + getStatus();
+        if (getUconUrl() != null) {
+            s += ", uconUrl=" + getUconUrl();
         }
         s += "]";
         return s;

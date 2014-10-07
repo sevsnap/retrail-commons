@@ -117,7 +117,7 @@ public class PepAttribute implements PepAttributeInterface {
     }
 
     @Override
-    public PepAttribute getParent() {
+    public PepAttributeInterface getParent() {
         return parent;
     }
 
