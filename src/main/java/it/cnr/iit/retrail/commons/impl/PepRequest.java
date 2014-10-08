@@ -53,15 +53,15 @@ implements PepRequestInterface {
         return request;
     }
 
-    protected static PepAttributeInterface newAttribute(Element e) {
+    protected PepAttributeInterface newAttribute(Element e) {
         return new PepAttribute(e);
     }
     
-    protected static PepAttributeInterface newAttribute(String id, String type, String value, String issuer, String category, String factory) {
+    protected PepAttributeInterface newAttribute(String id, String type, String value, String issuer, String category, String factory) {
         return new PepAttribute(id, type, value, issuer, category, factory);
     }
     
-    protected final static PepAttributeInterface newAttribute(PepAttributeInterface a) {
+    protected final PepAttributeInterface newAttribute(PepAttributeInterface a) {
         return newAttribute(a.getId(), a.getType(), a.getValue(), a.getIssuer(), a.getCategory(), a.getFactory());
     }
     
@@ -78,7 +78,7 @@ implements PepRequestInterface {
         NodeList children = req.getElementsByTagName(PolicyConstants.ATTRIBUTE);
         for (int i = 0; i < children.getLength(); i++) {
             Element e = (Element) children.item(i);
-            PepAttributeInterface a = PepRequest.newAttribute(e);
+            PepAttributeInterface a = newAttribute(e);
             add(a);
         }
     }
@@ -89,13 +89,14 @@ implements PepRequestInterface {
         for(Iterator<PepAttributeInterface> i = this.iterator(); i.hasNext(); )
             i.remove();
         for(PepAttributeInterface a: source) {
-            PepAttributeInterface nA = PepRequest.newAttribute(a);
+            PepAttributeInterface nA = newAttribute(a);
             add(nA);
         }
     }
 
     @Override
-    public final boolean add(PepAttributeInterface attribute) {
+    // FIXME add final
+    public boolean add(PepAttributeInterface attribute) {
         // Since XACML 3.0 organizes categories in <Attributes> blocks, 
         // we group the simple list of attributes in a map by category.
 
@@ -174,4 +175,8 @@ implements PepRequestInterface {
         return root;
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName()+" [size="+size()+"]";
+    }
 }
