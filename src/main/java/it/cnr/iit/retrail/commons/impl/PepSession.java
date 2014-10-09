@@ -24,7 +24,6 @@ public class PepSession extends PepResponse implements PepSessionInterface {
     private String uuid, customId;
     private URL uconUrl;
 
-
     private Status status = Status.UNKNOWN;
 
     public PepSession() throws Exception {

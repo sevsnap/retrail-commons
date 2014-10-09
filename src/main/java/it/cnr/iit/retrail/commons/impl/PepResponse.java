@@ -18,7 +18,7 @@ import org.w3c.dom.NodeList;
 public class PepResponse {
 
     private static final Log log = LogFactory.getLog(PepRequest.class);
-    protected final Element element;
+    protected Element element;
 
     public enum DecisionEnum {
         Indeterminate, NotApplicable, Deny, Permit
@@ -28,14 +28,18 @@ public class PepResponse {
     protected String message = "";
 
     public PepResponse(Document doc) {
-        element = (Element) doc.getElementsByTagName("Response").item(0);
-        String decisionString = element.getElementsByTagName("Decision").item(0).getTextContent();
-        decision = DecisionEnum.valueOf(decisionString);
-        NodeList statusMessages = element.getElementsByTagName("StatusMessage");
-        if (statusMessages.getLength() > 0) 
-            message = statusMessages.item(0).getTextContent();
+        setResponse(doc);
     }
 
+    public final void setResponse(Document doc) {
+        element = (Element) doc.getElementsByTagName("Response").item(0);
+        String decisionString = element.getElementsByTagName("Decision").item(0).getTextContent();
+        setDecision(DecisionEnum.valueOf(decisionString));
+        NodeList statusMessages = element.getElementsByTagName("StatusMessage");
+        if (statusMessages.getLength() > 0) 
+            setMessage(statusMessages.item(0).getTextContent());        
+    }
+    
     public DecisionEnum getDecision() {
         return decision;
     }
@@ -54,5 +58,15 @@ public class PepResponse {
 
     public Element toXacml3Element() {
         return element;
+    }
+    
+    @Override
+    public String toString() {
+        String s = getClass().getSimpleName()+" [decision=" + getDecision();
+        if (getMessage() != null && getMessage().length() > 0) {
+            s += ", message=" + getMessage();
+        }
+        s += "]";
+        return s;
     }
 }
