@@ -9,7 +9,6 @@ import it.cnr.iit.retrail.commons.DomUtils;
 import it.cnr.iit.retrail.commons.PepSessionInterface;
 import it.cnr.iit.retrail.commons.Status;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
