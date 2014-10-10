@@ -23,15 +23,11 @@ public interface PepAttributeInterface extends Serializable {
 
     String getIssuer();
 
-    PepAttributeInterface getParent();
-
     String getType();
 
     String getValue();
 
     void setExpires(Date expires);
-
-    void setParent(PepAttributeInterface parent);
 
     void setValue(String value);
     

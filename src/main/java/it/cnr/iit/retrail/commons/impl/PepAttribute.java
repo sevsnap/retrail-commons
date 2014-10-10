@@ -116,12 +116,10 @@ public class PepAttribute implements PepAttributeInterface {
         this.value = value;
     }
 
-    @Override
     public PepAttributeInterface getParent() {
         return parent;
     }
 
-    @Override
     public void setParent(PepAttributeInterface parent) {
         this.parent = (PepAttribute) parent;
     }

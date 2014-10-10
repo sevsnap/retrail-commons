@@ -73,6 +73,10 @@ implements PepRequestInterface {
     public PepRequest(Document doc) {
         super();
         categories = new HashMap<>();
+        setRequest(doc);
+    }
+    
+    public final void setRequest(Document doc) {
         Element req;
         req = (Element) doc.getElementsByTagName(PolicyConstants.Request.REQUEST_ELEMENT).item(0);
         NodeList children = req.getElementsByTagName(PolicyConstants.ATTRIBUTE);
@@ -80,7 +84,7 @@ implements PepRequestInterface {
             Element e = (Element) children.item(i);
             PepAttributeInterface a = newAttribute(e);
             add(a);
-        }
+        }        
     }
     
     public void copy(PepRequestInterface source) throws Exception {
@@ -105,6 +109,7 @@ implements PepRequestInterface {
             categoryList = new ArrayList<>();
             categories.put(attribute.getCategory(), categoryList);
         }
+        assert(attribute.getId() != null);
         for(PepAttributeInterface a: categoryList) {
             if(a.getId().equals(attribute.getId())) {
                 log.debug("already present, removing "+attribute);
