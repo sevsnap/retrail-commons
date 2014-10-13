@@ -5,7 +5,6 @@
 
 package it.cnr.iit.retrail.commons;
 
-
 import java.net.URL;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;

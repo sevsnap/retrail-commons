@@ -7,10 +7,6 @@ package it.cnr.iit.retrail.commons;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- *
- * @author oneadmin
- */
 public interface PepAttributeInterface extends Serializable {
 
     String getCategory();
