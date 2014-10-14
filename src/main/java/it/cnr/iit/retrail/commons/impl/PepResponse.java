@@ -5,8 +5,10 @@
 
 package it.cnr.iit.retrail.commons.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.ArrayList;
+import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -17,7 +19,7 @@ import org.w3c.dom.NodeList;
  */
 public class PepResponse {
 
-    private static final Log log = LogFactory.getLog(PepRequest.class);
+    private static final Logger log = LoggerFactory.getLogger(PepResponse.class);
     protected Element element;
 
     public enum DecisionEnum {
@@ -26,6 +28,7 @@ public class PepResponse {
 
     protected DecisionEnum decision = DecisionEnum.Indeterminate;
     protected String message = "";
+    protected Collection<String> obligations = new ArrayList<>();
 
     public PepResponse(Document doc) {
         setResponse(doc);
@@ -37,7 +40,11 @@ public class PepResponse {
         setDecision(DecisionEnum.valueOf(decisionString));
         NodeList statusMessages = element.getElementsByTagName("StatusMessage");
         if (statusMessages.getLength() > 0) 
-            setMessage(statusMessages.item(0).getTextContent());        
+            setMessage(statusMessages.item(0).getTextContent());
+        obligations.clear();
+        NodeList o = element.getElementsByTagName("Obligation");
+        for(int i = o.getLength(); i-- > 0;)
+            obligations.add(((Element)(o.item(i))).getAttribute("ObligationId"));
     }
     
     public DecisionEnum getDecision() {
@@ -56,6 +63,14 @@ public class PepResponse {
         this.message = message;
     }
 
+    public Collection<String> getObligations() {
+        return obligations;
+    }
+    
+    public void setObligations(Collection<String> obligations) {
+        this.obligations = obligations;
+    }
+    
     public Element toXacml3Element() {
         return element;
     }

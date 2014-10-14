@@ -76,10 +76,10 @@ public class PepSession extends PepResponse implements PepSessionInterface {
 
     public PepSession(Document doc) throws Exception {
         super(doc);
-        copy(doc);
+        copy();
     }
 
-    public final void copy(Document doc) throws Exception {
+    private void copy() throws Exception {
         Element session = (Element) element.getElementsByTagName("Session").item(0);
         if (session != null) {
             setUuid(session.getAttributeNS(null, "uuid"));
