@@ -10,6 +10,8 @@ import it.cnr.iit.retrail.commons.PepSessionInterface;
 import it.cnr.iit.retrail.commons.Status;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,7 +25,7 @@ public class PepSession extends PepResponse implements PepSessionInterface {
 
     private String uuid, customId;
     private URL uconUrl;
-
+    private Map<String,Object> localInfo = new HashMap<>();
     private Status status = Status.UNKNOWN;
 
     public PepSession() throws Exception {
@@ -93,6 +95,16 @@ public class PepSession extends PepResponse implements PepSessionInterface {
             setStatus(Status.UNKNOWN);
             setUconUrl(null);            
         }
+    }
+
+    @Override
+    public Map<String, Object> getLocalInfo() {
+        return localInfo;
+    }
+
+    @Override
+    public void setLocalInfo(Map<String, Object> localInfo) {
+        this.localInfo = localInfo;
     }
     
     @Override
