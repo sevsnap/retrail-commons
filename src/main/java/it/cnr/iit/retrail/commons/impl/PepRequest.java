@@ -76,9 +76,19 @@ implements PepRequestInterface {
         setRequest(doc);
     }
     
+    public PepRequest(Element e) {
+        super();
+        categories = new HashMap<>();
+        setRequest(e);
+    }
+    
     public final void setRequest(Document doc) {
         Element req;
         req = (Element) doc.getElementsByTagName(PolicyConstants.Request.REQUEST_ELEMENT).item(0);
+        setRequest(req);
+    }
+   
+    public final void setRequest(Element req) {
         NodeList children = req.getElementsByTagName(PolicyConstants.ATTRIBUTE);
         for (int i = 0; i < children.getLength(); i++) {
             Element e = (Element) children.item(i);
@@ -86,7 +96,7 @@ implements PepRequestInterface {
             add(a);
         }        
     }
-    
+        
     public void copy(PepRequestInterface source) throws Exception {
         categories.clear();
         BeanUtils.copyProperties(this, source);
