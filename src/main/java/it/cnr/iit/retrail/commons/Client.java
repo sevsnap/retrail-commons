@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.logging.Level;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
@@ -125,12 +124,8 @@ public final class Client extends XmlRpcClient {
         config.setConnectionTimeout(60 * 1000);
         config.setReplyTimeout(60 * 1000);
         
-        //stopRecording();
-        try {
-            startRecording(new File("/tmp/ciao"));
-        } catch (Exception ex) {
-            java.util.logging.Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        stopRecording();
+
         // set configuration
         setConfig(config);
     }
