@@ -68,6 +68,9 @@ public interface PepSessionInterface extends Serializable {
      */
     void setUuid(String uuid);
     
+    long getMs();
+    void setMs(long ms);
+    
     /**
      * LocalInfo is a custom property holding a dictionary intended for 
      * user needs. Values of this property are never used by the framework

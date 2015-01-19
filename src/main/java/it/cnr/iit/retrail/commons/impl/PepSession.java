@@ -27,6 +27,7 @@ public class PepSession extends PepResponse implements PepSessionInterface {
     private URL uconUrl;
     private Map<String,Object> localInfo = new HashMap<>();
     private Status status = Status.UNKNOWN;
+    private long ms;
 
     public PepSession() throws Exception {
         super(DomUtils.read("<Response><Result><Decision>" + DecisionEnum.Permit.name() + "</Decision><StatusMessage></StatusMessage></Result></Response>"));
@@ -76,6 +77,16 @@ public class PepSession extends PepResponse implements PepSessionInterface {
         this.uconUrl = uconUrl;
     }
 
+    @Override
+    public long getMs() {
+        return ms;
+    }
+
+    @Override
+    public void setMs(long ms) {
+        this.ms = ms;
+    }
+
     public PepSession(Document doc) throws Exception {
         super(doc);
         copy();
@@ -89,11 +100,14 @@ public class PepSession extends PepResponse implements PepSessionInterface {
             setStatus(Status.valueOf(session.getAttributeNS(null, "status")));
             String urlString = session.getAttributeNS(null, "uconUrl");
             setUconUrl(urlString.length() == 0 ? null : new URL(urlString));
+            String msString = session.getAttributeNS(null, "ms");
+            setMs(msString.length() > 0? Long.parseLong(msString) : 0);
         } else {
             setUuid(null);
             setCustomId(null);
             setStatus(Status.UNKNOWN);
             setUconUrl(null);            
+            setMs(0);
         }
     }
 
@@ -123,6 +137,9 @@ public class PepSession extends PepResponse implements PepSessionInterface {
         if (getStatus() != null) {
             session.setAttributeNS(null, "status", getStatus().name());
         }
+        if (getMs() != 0) {
+            session.setAttributeNS(null, "ms", ""+getMs());
+        }
         if (session.hasAttributes()) {
             root.appendChild(session);
         }
@@ -142,6 +159,9 @@ public class PepSession extends PepResponse implements PepSessionInterface {
         s += ", status=" + getStatus();
         if (getUconUrl() != null) {
             s += ", uconUrl=" + getUconUrl();
+        }
+        if (getMs() != 0) {
+            s += ", ms=" + getMs();
         }
         s += "]";
         return s;
