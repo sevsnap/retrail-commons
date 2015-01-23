@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 
 public class Server implements Runnable {
-    public static int watchdogPeriod = 15;
+    public int watchdogPeriod = 15;
     private Thread watchdogThread;
     
     public final URL myUrl;
