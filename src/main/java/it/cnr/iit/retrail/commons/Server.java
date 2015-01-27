@@ -42,7 +42,7 @@ public class Server implements Runnable {
         webServer = createWebServer(myUrl, APIClass, namespace);
     }
     
-    private WebServer createWebServer(URL myUrl, Class APIClass, String namespace) throws UnknownHostException, XmlRpcException {
+    public static WebServer createWebServer(URL myUrl, Class APIClass, String namespace) throws UnknownHostException, XmlRpcException {
         InetAddress address = java.net.InetAddress.getByName(myUrl.getHost());
         int port = myUrl.getPort();
         if(port == -1)
