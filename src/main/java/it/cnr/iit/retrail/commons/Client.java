@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
@@ -115,9 +117,10 @@ public final class Client extends XmlRpcClient {
         setTransportFactory(new XmlRpcCommonsTransportFactory(this));
     } 
     
-    public Client(URL serverUrl) {
+    public Client(URL serverUrl) throws NoSuchAlgorithmException, KeyManagementException {
         super();
-
+        if(serverUrl.getProtocol().equals("https"))
+            HttpsTrustManager.installFakeTrustManager();
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(serverUrl);
         config.setEnabledForExtensions(true);
