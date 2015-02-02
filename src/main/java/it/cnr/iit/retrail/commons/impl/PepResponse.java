@@ -34,8 +34,16 @@ public class PepResponse {
         setResponse(doc);
     }
 
+    public PepResponse(Element e) {
+        setResponse(e);
+    }
     public final void setResponse(Document doc) {
-        element = (Element) doc.getElementsByTagName("Response").item(0);
+        Element e = (Element) doc.getElementsByTagName("Response").item(0);
+        setResponse(e);
+    }
+    
+    public final void setResponse(Element e) {
+        element = e;
         String decisionString = element.getElementsByTagName("Decision").item(0).getTextContent();
         setDecision(DecisionEnum.valueOf(decisionString));
         NodeList statusMessages = element.getElementsByTagName("StatusMessage");

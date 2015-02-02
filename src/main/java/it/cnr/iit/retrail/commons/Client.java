@@ -117,10 +117,12 @@ public final class Client extends XmlRpcClient {
         setTransportFactory(new XmlRpcCommonsTransportFactory(this));
     } 
     
-    public Client(URL serverUrl) throws NoSuchAlgorithmException, KeyManagementException {
+    public Client(URL serverUrl) throws Exception {
         super();
-        if(serverUrl.getProtocol().equals("https"))
-            HttpsTrustManager.installFakeTrustManager();
+        if(serverUrl.getProtocol().equals("https")) {
+            InputStream ksIs = Client.class.getResourceAsStream("/META-INF/keystore.jks");
+            HttpsTrustManager.installFakeTrustManager(ksIs, "uconas4wc");   // FIXME
+        }
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(serverUrl);
         config.setEnabledForExtensions(true);

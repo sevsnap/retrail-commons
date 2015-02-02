@@ -4,6 +4,7 @@
  */
 package it.cnr.iit.retrail.commons;
 
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -33,19 +34,21 @@ public class Server implements Runnable {
      * @throws java.net.UnknownHostException
      * @throws org.apache.xmlrpc.XmlRpcException
      */
-    public Server(URL myUrl, Class APIClass) throws UnknownHostException, XmlRpcException, KeyManagementException, NoSuchAlgorithmException {
+    public Server(URL myUrl, Class APIClass) throws Exception {
         this.myUrl = myUrl;
         this.webServer = createWebServer(myUrl, APIClass, getClass().getSimpleName());
     }
 
-    public Server(URL myUrl, Class APIClass, String namespace) throws UnknownHostException, XmlRpcException, NoSuchAlgorithmException, KeyManagementException {
+    public Server(URL myUrl, Class APIClass, String namespace) throws Exception {
         this.myUrl = myUrl;
         webServer = createWebServer(myUrl, APIClass, namespace);
     }
 
-    public static WebServer createWebServer(URL myUrl, Class APIClass, String namespace) throws UnknownHostException, XmlRpcException, NoSuchAlgorithmException, KeyManagementException {
-        if(myUrl.getProtocol().equals("https"))
-            HttpsTrustManager.installFakeTrustManager();
+    public static WebServer createWebServer(URL myUrl, Class APIClass, String namespace) throws Exception {
+        if(myUrl.getProtocol().equals("https")) {
+            InputStream ksIs = Server.class.getResourceAsStream("/META-INF/keystore.jks");
+            HttpsTrustManager.installFakeTrustManager(ksIs, "uconas4wc");   // FIXME
+        }
         InetAddress address = java.net.InetAddress.getByName(myUrl.getHost());
         int port = myUrl.getPort();
         if (port == -1) {
@@ -54,7 +57,9 @@ public class Server implements Runnable {
         if (port == -1) {
             port = 80;
         }
-        WebServer wServer = new WebServer(port, address);
+        WebServer wServer = myUrl.getProtocol().equals("https")?
+                new HttpsWebServer(port, address) :
+                new WebServer(port, address);
         XmlRpcServer server = wServer.getXmlRpcServer();
         PropertyHandlerMapping phm;
         phm = new PropertyHandlerMapping();

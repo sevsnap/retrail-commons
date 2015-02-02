@@ -92,6 +92,11 @@ public class PepSession extends PepResponse implements PepSessionInterface {
         copy();
     }
 
+    public PepSession(Element e) throws Exception {
+        super(e);
+        copy();
+    }
+
     private void copy() throws Exception {
         Element session = (Element) element.getElementsByTagName("Session").item(0);
         if (session != null) {
