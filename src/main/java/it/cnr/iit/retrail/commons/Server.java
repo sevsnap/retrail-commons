@@ -7,10 +7,7 @@ package it.cnr.iit.retrail.commons;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
-import java.net.UnknownHostException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import org.apache.xmlrpc.XmlRpcException;
+import javax.net.ssl.SSLContext;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
@@ -21,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class Server implements Runnable {
 
     public int watchdogPeriod = 15;
-    private Thread watchdogThread;
+    private Thread watchdogThread = null;
 
     public final URL myUrl;
     private final WebServer webServer;
@@ -43,12 +40,8 @@ public class Server implements Runnable {
         this.myUrl = myUrl;
         webServer = createWebServer(myUrl, APIClass, namespace);
     }
-
+    
     public static WebServer createWebServer(URL myUrl, Class APIClass, String namespace) throws Exception {
-        if(myUrl.getProtocol().equals("https")) {
-            InputStream ksIs = Server.class.getResourceAsStream("/META-INF/keystore.jks");
-            HttpsTrustManager.installFakeTrustManager(ksIs, "uconas4wc");   // FIXME
-        }
         InetAddress address = java.net.InetAddress.getByName(myUrl.getHost());
         int port = myUrl.getPort();
         if (port == -1) {
@@ -76,6 +69,15 @@ public class Server implements Runnable {
             log.info(method);
         }
         return wServer;
+    }
+    
+    public SSLContext trustAllClients(InputStream keystoreStream, String password) throws Exception {
+        // must not be started
+        assert(watchdogThread == null);
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+        sslContext.init(HttpsTrustManager.getKeyManagers(keystoreStream, password), HttpsTrustManager.getTrustManagers(), null);
+        HttpsWebServer.sslContext = sslContext;
+        return sslContext;
     }
 
     public void init() throws Exception {

@@ -1,6 +1,7 @@
 /*
  * CNR - IIT
- * Coded by: 2014 Enrico "KMcC;) Carniani
+ * Coded by: 2014-2015 Enrico "KMcC;) Carniani
+ * TODO: Use XmlRpcLiteHttp14TransportFactory
  */
 
 package it.cnr.iit.retrail.commons;
@@ -14,16 +15,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
-import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
 import org.apache.xmlrpc.client.XmlRpcStreamTransport;
 import org.apache.xmlrpc.client.XmlRpcSunHttpTransport;
+import org.apache.xmlrpc.client.XmlRpcSunHttpTransportFactory;
 import org.apache.xmlrpc.client.XmlRpcTransport;
-import org.apache.xmlrpc.client.XmlRpcTransportFactory;
 import org.apache.xmlrpc.common.XmlRpcStreamRequestConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,8 +81,13 @@ public final class Client extends XmlRpcClient {
         }
     }
     
-    private class TransportFactory implements XmlRpcTransportFactory {
+    private class TransportFactory extends XmlRpcSunHttpTransportFactory {
         private XmlRpcTransport singleton;
+
+        public TransportFactory(XmlRpcClient pClient) {
+            super(pClient);
+        }
+       
         @Override
         public XmlRpcTransport getTransport() {
             if(singleton == null) {
@@ -99,10 +104,12 @@ public final class Client extends XmlRpcClient {
         out = new FileOutputStream(outputFile);
         out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<retrailRecorder>\n".getBytes());
         millis = System.currentTimeMillis();
-        setTransportFactory(new TransportFactory());
+        setTransportFactory(new TransportFactory(this));
+        
     }
 
     public synchronized void stopRecording() {
+        
         if(out != null) {
             log.info("switching log recorder OFF.");
             try {
@@ -114,15 +121,22 @@ public final class Client extends XmlRpcClient {
             out = null;
         }
         millis = 0;
-        setTransportFactory(new XmlRpcCommonsTransportFactory(this));
+        setTransportFactory(new XmlRpcSunHttpTransportFactory(this));
     } 
+  
+    public void trustAllServers() throws Exception {
+        log.warn("creating fake trust context (it does not validate certificate chains)");
+        // Install the all-trusting trust manager
+        SSLContext contextForUntrusted = SSLContext.getInstance("SSL");
+        contextForUntrusted.init(null, HttpsTrustManager.getTrustManagers(), new java.security.SecureRandom());
+        // Since we're using the XmlRpcSunHttpTransportFactory, that in turn
+        // uses the java URL HTTP connection, we can simply set the defaults.
+        HttpsURLConnection.setDefaultSSLSocketFactory(contextForUntrusted.getSocketFactory());
+        HttpsURLConnection.setDefaultHostnameVerifier(HttpsTrustManager.getHostnameVerifier());
+    }
     
     public Client(URL serverUrl) throws Exception {
         super();
-        if(serverUrl.getProtocol().equals("https")) {
-            InputStream ksIs = Client.class.getResourceAsStream("/META-INF/keystore.jks");
-            HttpsTrustManager.installFakeTrustManager(ksIs, "uconas4wc");   // FIXME
-        }
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(serverUrl);
         config.setEnabledForExtensions(true);
