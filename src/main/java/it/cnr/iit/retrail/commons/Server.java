@@ -71,7 +71,7 @@ public class Server implements Runnable {
         return wServer;
     }
     
-    public SSLContext trustAllClients(InputStream keystoreStream, String password) throws Exception {
+    public SSLContext trustAllPeers(InputStream keystoreStream, String password) throws Exception {
         // must not be started
         assert(watchdogThread == null);
         SSLContext sslContext = SSLContext.getInstance("SSL");

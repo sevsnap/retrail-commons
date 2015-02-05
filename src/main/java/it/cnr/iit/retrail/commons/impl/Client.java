@@ -4,8 +4,10 @@
  * TODO: Use XmlRpcLiteHttp14TransportFactory
  */
 
-package it.cnr.iit.retrail.commons;
+package it.cnr.iit.retrail.commons.impl;
 
+import it.cnr.iit.retrail.commons.RecorderInterface;
+import it.cnr.iit.retrail.commons.HttpsTrustManager;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,11 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-public final class Client extends XmlRpcClient {
+public final class Client extends XmlRpcClient implements RecorderInterface {
     protected static final Logger log = LoggerFactory.getLogger(Client.class);
     FileOutputStream out;
     long millis;
-    
+
     private class MessageLoggingTransport extends XmlRpcSunHttpTransport {
  
         public MessageLoggingTransport(final XmlRpcClient pClient) {
@@ -98,6 +100,7 @@ public final class Client extends XmlRpcClient {
         }    
     }
     
+    @Override
     public synchronized void startRecording(File outputFile) throws Exception {
         stopRecording();
         log.info("switching log recorder ON. Logging to {}", outputFile.getAbsolutePath());
@@ -107,9 +110,19 @@ public final class Client extends XmlRpcClient {
         setTransportFactory(new TransportFactory(this));
         
     }
+    
+    @Override
+    public void continueRecording(File outputFile) throws Exception {
+        startRecording(outputFile);
+    }
 
+    @Override
+    public boolean isRecording() {
+        return out != null;
+    }
+    
+    @Override
     public synchronized void stopRecording() {
-        
         if(out != null) {
             log.info("switching log recorder OFF.");
             try {
@@ -124,15 +137,18 @@ public final class Client extends XmlRpcClient {
         setTransportFactory(new XmlRpcSunHttpTransportFactory(this));
     } 
   
-    public void trustAllServers() throws Exception {
+    @Override
+    public SSLContext trustAllPeers() throws Exception {
         log.warn("creating fake trust context (it does not validate certificate chains)");
         // Install the all-trusting trust manager
         SSLContext contextForUntrusted = SSLContext.getInstance("SSL");
         contextForUntrusted.init(null, HttpsTrustManager.getTrustManagers(), new java.security.SecureRandom());
+        // FIXME make it local!
         // Since we're using the XmlRpcSunHttpTransportFactory, that in turn
         // uses the java URL HTTP connection, we can simply set the defaults.
         HttpsURLConnection.setDefaultSSLSocketFactory(contextForUntrusted.getSocketFactory());
         HttpsURLConnection.setDefaultHostnameVerifier(HttpsTrustManager.getHostnameVerifier());
+        return contextForUntrusted;
     }
     
     public Client(URL serverUrl) throws Exception {
@@ -148,5 +164,4 @@ public final class Client extends XmlRpcClient {
         // set configuration
         setConfig(config);
     }
-
 }

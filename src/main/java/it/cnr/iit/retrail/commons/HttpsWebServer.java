@@ -4,13 +4,10 @@
  */
 package it.cnr.iit.retrail.commons;
 
-import static it.cnr.iit.retrail.commons.Client.log;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import javax.net.ServerSocketFactory;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import org.apache.xmlrpc.webserver.WebServer;
 import org.slf4j.Logger;
