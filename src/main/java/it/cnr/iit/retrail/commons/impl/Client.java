@@ -12,11 +12,17 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.logging.Level;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import org.apache.xmlrpc.XmlRpcException;
@@ -33,8 +39,10 @@ import org.xml.sax.SAXException;
 
 public final class Client extends XmlRpcClient implements RecorderInterface {
     protected static final Logger log = LoggerFactory.getLogger(Client.class);
-    FileOutputStream out;
+    FileWriter out;
     long millis;
+    static private final String openTag = "<retrailRecorder>";
+    static private final String closeTag = "</retrailRecorder>";
 
     private class MessageLoggingTransport extends XmlRpcSunHttpTransport {
  
@@ -47,10 +55,10 @@ public final class Client extends XmlRpcClient implements RecorderInterface {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             pWriter.write(baos);
             long delta = System.currentTimeMillis() - millis;
-            out.write(("<record ms=\""+delta+"\">\n").getBytes());
+            out.append("<record ms=\""+delta+"\">\n");
             String req = baos.toString().replaceFirst("<\\?.*?\\?>", "");
-            out.write(req.getBytes());
-            out.write(("\n").getBytes());
+            out.append(req);
+            out.append("\n");
             super.writeRequest(pWriter);
         }
 
@@ -72,8 +80,8 @@ public final class Client extends XmlRpcClient implements RecorderInterface {
  
             try {
                 String req = sb.toString().replaceFirst("<\\?.*?\\?>", "");
-                out.write(req.getBytes());
-                out.write("\n</record>\n".getBytes());
+                out.append(req);
+                out.append("\n</record>\n");
             }
             catch(final IOException e) {
                 log.error("while writing to local file: {}", e);
@@ -104,16 +112,32 @@ public final class Client extends XmlRpcClient implements RecorderInterface {
     public synchronized void startRecording(File outputFile) throws Exception {
         stopRecording();
         log.info("switching log recorder ON. Logging to {}", outputFile.getAbsolutePath());
-        out = new FileOutputStream(outputFile);
-        out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<retrailRecorder>\n".getBytes());
+        out = new FileWriter(outputFile, false);
+        out.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+openTag+"\n");
         millis = System.currentTimeMillis();
-        setTransportFactory(new TransportFactory(this));
-        
+        setTransportFactory(new TransportFactory(this));    
     }
     
     @Override
-    public void continueRecording(File outputFile) throws Exception {
-        startRecording(outputFile);
+    public void continueRecording(File target) throws Exception {
+        if(out == null) {
+            if (target.exists()) {
+                log.info("append data logging to {}", target.getAbsolutePath());
+                RandomAccessFile file = new RandomAccessFile(target, "rwd");
+                long newPos = target.length()-closeTag.length();
+                if(newPos >= 0) {
+                    file.seek(newPos); // Set the pointer to closeTag
+                    if(file.readLine().equals(closeTag)) {               
+                        file.setLength(newPos);
+                        log.info("removing trailing {}", closeTag);
+                    }
+                }
+                file.close();
+                out = new FileWriter(target, true);
+            } else {
+                startRecording(target);
+            }
+        }
     }
 
     @Override
@@ -126,7 +150,7 @@ public final class Client extends XmlRpcClient implements RecorderInterface {
         if(out != null) {
             log.info("switching log recorder OFF.");
             try {
-                out.write("</retrailRecorder>".getBytes());
+                out.append(closeTag);
                 out.close();
             } catch (IOException ex) {
                 log.error("IO exception: {}", ex.getMessage());

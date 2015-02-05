@@ -17,7 +17,9 @@ public interface PepRequestInterface extends Collection<PepAttributeInterface>, 
     PepAttributeInterface getAttribute(String category, String id);
 
     Collection<PepAttributeInterface> getCategory(String category);
-
+    
+    boolean replace(PepAttributeInterface attribute);
+    
     Element toElement() throws Exception;
     
 }

@@ -2,7 +2,6 @@
  * CNR - IIT
  * Coded by: 2014 Enrico "KMcC;) Carniani
  */
-
 package it.cnr.iit.retrail.commons.impl;
 
 import it.cnr.iit.retrail.commons.PepAttributeInterface;
@@ -34,13 +33,12 @@ import org.wso2.balana.utils.policy.dto.RequestElementDTO;
  *
  * @author oneadmin
  */
-public class PepRequest 
-extends ArrayList<PepAttributeInterface> 
-implements PepRequestInterface {
-    // Attributes may be overwritten (they are simply replaced).
+public class PepRequest
+        extends ArrayList<PepAttributeInterface>
+        implements PepRequestInterface {
     protected static final Logger log = LoggerFactory.getLogger(PepRequest.class);
     private final Map<String, Collection<PepAttributeInterface>> categories;
-    
+
     public static PepRequest newInstance(String subject, String action, String resourceUrl, String issuer) {
         PepRequest request = new PepRequest();
         PepAttribute attribute;
@@ -56,15 +54,15 @@ implements PepRequestInterface {
     protected PepAttributeInterface newAttribute(Element e) {
         return new PepAttribute(e);
     }
-    
+
     protected PepAttributeInterface newAttribute(String id, String type, String value, String issuer, String category, String factory) {
         return new PepAttribute(id, type, value, issuer, category, factory);
     }
-    
+
     protected final PepAttributeInterface newAttribute(PepAttributeInterface a) {
         return newAttribute(a.getId(), a.getType(), a.getValue(), a.getIssuer(), a.getCategory(), a.getFactory());
     }
-    
+
     public PepRequest() {
         super();
         categories = new HashMap<>();
@@ -75,36 +73,37 @@ implements PepRequestInterface {
         categories = new HashMap<>();
         setRequest(doc);
     }
-    
+
     public PepRequest(Element e) {
         super();
         categories = new HashMap<>();
         setRequest(e);
     }
-    
+
     public final void setRequest(Document doc) {
         Element req;
         req = (Element) doc.getElementsByTagName(PolicyConstants.Request.REQUEST_ELEMENT).item(0);
         setRequest(req);
     }
-   
+
     public final void setRequest(Element req) {
         NodeList children = req.getElementsByTagName(PolicyConstants.ATTRIBUTE);
         for (int i = 0; i < children.getLength(); i++) {
             Element e = (Element) children.item(i);
             PepAttributeInterface a = newAttribute(e);
             add(a);
-        }        
+        }
     }
-        
+
     public void copy(PepRequestInterface source) throws Exception {
         categories.clear();
         BeanUtils.copyProperties(this, source);
-        for(Iterator<PepAttributeInterface> i = this.iterator(); i.hasNext(); )
+        for (Iterator<PepAttributeInterface> i = this.iterator(); i.hasNext();) {
             i.remove();
-        for(PepAttributeInterface a: source) {
+        }
+        for (PepAttributeInterface a : source) {
             PepAttributeInterface nA = newAttribute(a);
-            add(nA);
+            replace(nA);
         }
     }
 
@@ -119,45 +118,67 @@ implements PepRequestInterface {
             categoryList = new ArrayList<>();
             categories.put(attribute.getCategory(), categoryList);
         }
-        assert(attribute.getId() != null);
-        for(PepAttributeInterface a: categoryList) {
-            if(a.getId().equals(attribute.getId())) {
-                log.debug("already present, removing "+attribute);
-                categoryList.remove(a);
-                super.remove(a);
+        assert (attribute.getId() != null);
+        for (PepAttributeInterface a : categoryList) {
+            if (a.getId().equals(attribute.getId())) {
+                log.debug("attribute {} already present as {}", attribute, a);
+                //assert (!a.getId().equals(attribute.getId()));
+                //categoryList.remove(a);
+                //super.remove(a);
                 break;
             }
         }
-        log.debug("adding "+attribute);
+        log.debug("adding " + attribute);
         categoryList.add(attribute);
         return super.add(attribute);
     }
     
     @Override
+    public boolean replace(PepAttributeInterface attribute) {
+        boolean found = false;
+        Collection<PepAttributeInterface> categoryList = categories.get(attribute.getCategory());
+        if (categoryList != null)
+            for (PepAttributeInterface a : categoryList) {
+                found = a.getId().equals(attribute.getId());
+                if (found) {
+                    log.debug("already present, removing " + attribute);
+                    categoryList.remove(a);
+                    super.remove(a);
+                    break;
+                }
+            }
+        add(attribute);
+        return found;
+    }
+
+    @Override
     public boolean remove(Object attribute) {
         throw new UnsupportedOperationException("attribute removal is not allowed");
     }
-    
+
     @Override
     public Collection<PepAttributeInterface> getCategory(String category) {
         return categories.get(category);
     }
-    
+
     @Override
     public PepAttributeInterface getAttribute(String category, String id) {
         Collection<PepAttributeInterface> c = categories.get(category);
-        if(c != null)
-            for(PepAttributeInterface a: c)
-                if(id.equals(a.getId()) && category.equals(a.getCategory()))
+        if (c != null) {
+            for (PepAttributeInterface a : c) {
+                if (id.equals(a.getId()) && category.equals(a.getCategory())) {
                     return a;
+                }
+            }
+        }
         return null;
     }
-    
+
     @Override
     public Element toElement() throws Exception {
         // we now build the request, using balana as much as possible.
         RequestElementDTO requestElementDTO = new RequestElementDTO();
-           
+
         List<AttributesElementDTO> attributesElementDTOs = new ArrayList<>();
         requestElementDTO.setCombinedDecision(false);
         requestElementDTO.setReturnPolicyIdList(false);
@@ -192,6 +213,6 @@ implements PepRequestInterface {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName()+" [size="+size()+"]";
+        return getClass().getSimpleName() + " [size=" + size() + "]";
     }
 }
