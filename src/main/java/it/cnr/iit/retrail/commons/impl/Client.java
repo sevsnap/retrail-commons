@@ -12,17 +12,12 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.logging.Level;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import org.apache.xmlrpc.XmlRpcException;
@@ -40,7 +35,8 @@ import org.xml.sax.SAXException;
 public final class Client extends XmlRpcClient implements RecorderInterface {
     protected static final Logger log = LoggerFactory.getLogger(Client.class);
     FileWriter out;
-    long millis;
+    private long millis;
+
     static private final String openTag = "<retrailRecorder>";
     static private final String closeTag = "</retrailRecorder>";
 
@@ -55,10 +51,13 @@ public final class Client extends XmlRpcClient implements RecorderInterface {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             pWriter.write(baos);
             long delta = System.currentTimeMillis() - millis;
-            out.append("<record ms=\""+delta+"\">\n");
-            String req = baos.toString().replaceFirst("<\\?.*?\\?>", "");
-            out.append(req);
-            out.append("\n");
+            String req = "<record ms=\""+delta+"\">\n"+baos.toString().replaceFirst("<\\?.*?\\?>", "")+"\n";
+            try {
+                out.append(req);
+            }
+            catch(IOException e) {
+                log.error("while appending to log file: {}", e);
+            }
             super.writeRequest(pWriter);
         }
 
@@ -115,14 +114,16 @@ public final class Client extends XmlRpcClient implements RecorderInterface {
         out = new FileWriter(outputFile, false);
         out.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+openTag+"\n");
         millis = System.currentTimeMillis();
-        setTransportFactory(new TransportFactory(this));    
+        setTransportFactory(new TransportFactory(this));
     }
     
     @Override
-    public void continueRecording(File target) throws Exception {
+    public void continueRecording(File target, long millis) throws Exception {
+        log.debug("called for {}", target.getAbsolutePath());
+        this.millis = millis;
         if(out == null) {
             if (target.exists()) {
-                log.info("append data logging to {}", target.getAbsolutePath());
+                log.debug("append data logging to {}", target.getAbsolutePath());
                 RandomAccessFile file = new RandomAccessFile(target, "rwd");
                 long newPos = target.length()-closeTag.length();
                 if(newPos >= 0) {
@@ -133,8 +134,12 @@ public final class Client extends XmlRpcClient implements RecorderInterface {
                     }
                 }
                 file.close();
+                log.debug("opening file {} in append mode", target.getAbsolutePath());
                 out = new FileWriter(target, true);
+                assert(out != null);
+                setTransportFactory(new TransportFactory(this));
             } else {
+                log.debug("target {} does not exist, creating new file", target.getAbsolutePath());
                 startRecording(target);
             }
         }
@@ -157,7 +162,6 @@ public final class Client extends XmlRpcClient implements RecorderInterface {
             }
             out = null;
         }
-        millis = 0;
         setTransportFactory(new XmlRpcSunHttpTransportFactory(this));
     } 
   
@@ -175,6 +179,10 @@ public final class Client extends XmlRpcClient implements RecorderInterface {
         return contextForUntrusted;
     }
     
+    public long getMillis() {
+        return millis;
+    }
+
     public Client(URL serverUrl) throws Exception {
         super();
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();

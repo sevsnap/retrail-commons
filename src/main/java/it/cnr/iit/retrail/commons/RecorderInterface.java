@@ -15,7 +15,7 @@ public interface RecorderInterface {
 
     void startRecording(File outputFile) throws Exception;
     
-    void continueRecording(File outputFile) throws Exception;
+    void continueRecording(File outputFile, long millis) throws Exception;
     
     boolean isRecording();
 
