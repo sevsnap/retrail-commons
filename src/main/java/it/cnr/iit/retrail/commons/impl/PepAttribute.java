@@ -93,15 +93,16 @@ public class PepAttribute implements PepAttributeInterface {
         this.parent = null;
     }
 
-    public PepAttribute(Element attributeElement) {
+    public PepAttribute(Element attributeValueElement) {
         // XACML 3.0 format
+        assert(attributeValueElement.getTagName().equals("AttributeValue"));
+        Element attributeElement = (Element) attributeValueElement.getParentNode();
         Element rootElement = (Element) attributeElement.getParentNode();
         category = rootElement.getAttribute(PolicyConstants.CATEGORY);
         id = attributeElement.getAttribute(PolicyConstants.ATTRIBUTE_ID);
         issuer = attributeElement.getAttribute(PolicyConstants.ISSUER);
-        Element attributeValue = (Element) attributeElement.getElementsByTagName(PolicyConstants.ATTRIBUTE_VALUE).item(0);
-        type = attributeValue.getAttribute(PolicyConstants.DATA_TYPE);
-        value = attributeValue.getTextContent();
+        type = attributeValueElement.getAttribute(PolicyConstants.DATA_TYPE);
+        value = attributeValueElement.getTextContent();
         factory = null;
         parent = null;
     }

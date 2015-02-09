@@ -87,7 +87,7 @@ public class PepRequest
     }
 
     public final void setRequest(Element req) {
-        NodeList children = req.getElementsByTagName(PolicyConstants.ATTRIBUTE);
+        NodeList children = req.getElementsByTagName(PolicyConstants.ATTRIBUTE_VALUE);
         for (int i = 0; i < children.getLength(); i++) {
             Element e = (Element) children.item(i);
             PepAttributeInterface a = newAttribute(e);

@@ -8,6 +8,7 @@ package it.cnr.iit.retrail.commons;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.logging.Level;
@@ -72,6 +73,13 @@ public class DomUtils {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder(); 
         Document doc = db.parse(inFile);
+        return doc;
+    }
+     
+    public static Document read(InputStream is) throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder(); 
+        Document doc = db.parse(is);
         return doc;
     }
 }
