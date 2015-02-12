@@ -31,6 +31,8 @@ import org.xml.sax.SAXException;
  * @author oneadmin
  */
 public class DomUtils {
+    private static DocumentBuilderFactory dbFactory;
+    
     public static void write(Node n, OutputStream out) throws TransformerException {
             // write the content into xml file
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -56,30 +58,30 @@ public class DomUtils {
         return xml;
     }
     
+    private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+        if(dbFactory == null) {
+            dbFactory = DocumentBuilderFactory.newInstance();
+            dbFactory.setNamespaceAware(true);
+        }
+	return dbFactory.newDocumentBuilder();
+    }
+    
     public static Document newDocument() throws ParserConfigurationException {
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-	return dBuilder.newDocument();
+        return getDocumentBuilder().newDocument();
     }
     
     public static Document read(String data) throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-	Document doc = dBuilder.parse(new InputSource(new ByteArrayInputStream(data.getBytes("utf-8"))));
+	Document doc = getDocumentBuilder().parse(new InputSource(new ByteArrayInputStream(data.getBytes("utf-8"))));
         return doc;
     }
     
     public static Document read(File inFile) throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder(); 
-        Document doc = db.parse(inFile);
+        Document doc = getDocumentBuilder().parse(inFile);
         return doc;
     }
      
     public static Document read(InputStream is) throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder(); 
-        Document doc = db.parse(is);
+        Document doc = getDocumentBuilder().parse(is);
         return doc;
     }
 }

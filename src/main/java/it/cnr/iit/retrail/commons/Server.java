@@ -17,7 +17,8 @@ import org.slf4j.LoggerFactory;
 
 public class Server implements Runnable {
 
-    public int watchdogPeriod = 15;
+    private int watchdogPeriod = 15;
+    private final Object watchdogMonitor = new Object();
     private Thread watchdogThread = null;
 
     public final URL myUrl;
@@ -77,6 +78,7 @@ public class Server implements Runnable {
         SSLContext sslContext = SSLContext.getInstance("SSL");
         sslContext.init(HttpsTrustManager.getKeyManagers(keystoreStream, password), HttpsTrustManager.getTrustManagers(), null);
         HttpsWebServer.sslContext = sslContext;
+        
         return sslContext;
     }
 
@@ -104,16 +106,32 @@ public class Server implements Runnable {
     }
 
     protected void watchdog() throws InterruptedException {
-        log.info("Server.heartbeat(): idle call");
+        log.info("idle call");
+    }
+    
+    public int getWatchdogPeriod() {
+        synchronized(watchdogMonitor) {
+            return watchdogPeriod;
+        }
     }
 
+    public void setWatchdogPeriod(int watchdogPeriod) {
+        synchronized(watchdogMonitor) {
+            this.watchdogPeriod = watchdogPeriod;
+            log.warn("setting watchdog period to: {}s", watchdogPeriod);
+            watchdogMonitor.notifyAll();
+        }
+    }
     @Override
     public void run() {
         // heartbeat
         while (true) {
             try {
                 watchdog();
-                Thread.sleep(watchdogPeriod * 1000);
+                synchronized(watchdogMonitor) {
+                    watchdogMonitor.wait(watchdogPeriod*1000);
+                    log.debug("watchdog awaken");
+                }
             } catch (InterruptedException ex) {
                 log.warn("{} interrupted -- exiting", Thread.currentThread());
                 return;

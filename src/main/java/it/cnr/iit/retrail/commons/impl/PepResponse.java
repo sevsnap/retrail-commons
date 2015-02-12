@@ -5,6 +5,7 @@
 
 package it.cnr.iit.retrail.commons.impl;
 
+import it.cnr.iit.retrail.commons.DomUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.wso2.balana.utils.Constants.PolicyConstants;
 
 /**
  *
@@ -38,21 +40,32 @@ public class PepResponse {
         setResponse(e);
     }
     public final void setResponse(Document doc) {
-        Element e = (Element) doc.getElementsByTagName("Response").item(0);
-        setResponse(e);
+        NodeList nl = doc.getElementsByTagNameNS("*", "Response");
+        // NOTE: if the Response has no namespace declared, the following
+        // assertion will fail.
+        // Example: <Response xmlns="...."> is ok, but <Response> is not.
+        assert(nl.getLength() == 1);
+        setResponse((Element) nl.item(0));
     }
     
     public final void setResponse(Element e) {
         element = e;
-        String decisionString = element.getElementsByTagName("Decision").item(0).getTextContent();
+        assert(e != null);
+        NodeList nl = element.getElementsByTagNameNS("*", "Decision");
+        assert(nl.getLength() == 1);
+        String decisionString = nl.item(0).getTextContent();
         setDecision(DecisionEnum.valueOf(decisionString));
-        NodeList statusMessages = element.getElementsByTagName("StatusMessage");
+        NodeList statusMessages = element.getElementsByTagNameNS("*", "StatusMessage");
         if (statusMessages.getLength() > 0) 
             setMessage(statusMessages.item(0).getTextContent());
         obligations.clear();
-        NodeList o = element.getElementsByTagName("Obligation");
-        for(int i = o.getLength(); i-- > 0;)
-            obligations.add(((Element)(o.item(i))).getAttribute("ObligationId"));
+        NodeList o = element.getElementsByTagNameNS("*", "Obligation");
+        for(int i = o.getLength(); i-- > 0;) {
+            // FIXME getAttributeNS("*", PolicyConstants.OBLIGATION_ID) not working
+            String value = ((Element)o.item(i)).getAttributeNS(null, PolicyConstants.OBLIGATION_ID);
+            assert(value.length() > 0);
+            obligations.add(value);
+        }
     }
     
     public DecisionEnum getDecision() {

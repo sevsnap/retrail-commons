@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.wso2.balana.XACMLConstants;
 import org.xml.sax.SAXException;
 
 /**
@@ -30,11 +31,11 @@ public class PepSession extends PepResponse implements PepSessionInterface {
     private long ms;
 
     public PepSession() throws Exception {
-        super(DomUtils.read("<Response><Result><Decision>" + DecisionEnum.Permit.name() + "</Decision><StatusMessage></StatusMessage></Result></Response>"));
+        super(DomUtils.read("<Response xmlns=\""+XACMLConstants.XACML_3_0_IDENTIFIER+"\"><Result><Decision>" + DecisionEnum.Permit.name() + "</Decision><StatusMessage></StatusMessage></Result></Response>"));
     }
     
     public PepSession(DecisionEnum decisionEnum, String statusMessage) throws ParserConfigurationException, SAXException, IOException {
-        super(DomUtils.read("<Response><Result><Decision>" + decisionEnum.name() + "</Decision><StatusMessage>" + statusMessage + "</StatusMessage></Result></Response>"));
+        super(DomUtils.read("<Response xmlns=\""+XACMLConstants.XACML_3_0_IDENTIFIER+"\"><Result><Decision>" + decisionEnum.name() + "</Decision><StatusMessage>" + statusMessage + "</StatusMessage></Result></Response>"));
     }
 
     @Override
@@ -98,7 +99,7 @@ public class PepSession extends PepResponse implements PepSessionInterface {
     }
 
     private void copy() throws Exception {
-        Element session = (Element) element.getElementsByTagName("Session").item(0);
+        Element session = (Element) element.getElementsByTagNameNS("*", "Session").item(0);
         if (session != null) {
             setUuid(session.getAttributeNS(null, "uuid"));
             setCustomId(session.getAttributeNS(null, "customId"));

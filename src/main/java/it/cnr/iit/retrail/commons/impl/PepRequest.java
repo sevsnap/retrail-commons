@@ -4,6 +4,7 @@
  */
 package it.cnr.iit.retrail.commons.impl;
 
+import it.cnr.iit.retrail.commons.DomUtils;
 import it.cnr.iit.retrail.commons.PepAttributeInterface;
 import it.cnr.iit.retrail.commons.PepRequestInterface;
 import java.util.ArrayList;
@@ -13,8 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.beanutils.BeanUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -82,12 +81,12 @@ public class PepRequest
 
     public final void setRequest(Document doc) {
         Element req;
-        req = (Element) doc.getElementsByTagName(PolicyConstants.Request.REQUEST_ELEMENT).item(0);
+        req = (Element) doc.getElementsByTagNameNS("*", PolicyConstants.Request.REQUEST_ELEMENT).item(0);
         setRequest(req);
     }
 
     public final void setRequest(Element req) {
-        NodeList children = req.getElementsByTagName(PolicyConstants.ATTRIBUTE_VALUE);
+        NodeList children = req.getElementsByTagNameNS("*", PolicyConstants.ATTRIBUTE_VALUE);
         for (int i = 0; i < children.getLength(); i++) {
             Element e = (Element) children.item(i);
             PepAttributeInterface a = newAttribute(e);
@@ -200,14 +199,11 @@ public class PepRequest
             attributesElementDTOs.add(attributesElementDTO);
         }
         requestElementDTO.setAttributesElementDTOs(attributesElementDTOs);
-
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-        // root elements
-        Document doc = docBuilder.newDocument();
+        // root element
+        Document doc = DomUtils.newDocument();
         Element root = PolicyUtils.createRequestElement(requestElementDTO, doc);
-        //doc.setDocumentURI(XACMLConstants.REQUEST_CONTEXT_3_0_IDENTIFIER);
+        doc.appendChild(root);
+        //log.warn("DOCUMENT XXX: {}", DomUtils.toString(doc));
         return root;
     }
 
