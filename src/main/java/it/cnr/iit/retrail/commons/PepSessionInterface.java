@@ -6,6 +6,7 @@ package it.cnr.iit.retrail.commons;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -67,6 +68,8 @@ public interface PepSessionInterface extends Serializable {
      * @param uuid the new attributed uuid.
      */
     void setUuid(String uuid);
+    
+    Collection<String> getObligations();
     
     long getMs();
     void setMs(long ms);

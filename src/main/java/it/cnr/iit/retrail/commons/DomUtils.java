@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -83,5 +84,15 @@ public class DomUtils {
     public static Document read(InputStream is) throws ParserConfigurationException, SAXException, IOException {
         Document doc = getDocumentBuilder().parse(is);
         return doc;
+    }
+    
+    public static Element findClosestParentWithTag(String theTag, Node startingFromThis) {
+        Element rv = null;
+        if(startingFromThis == null)
+            rv = null;
+        else if(startingFromThis instanceof Element && ((Element)startingFromThis).getTagName().equals(theTag)) {
+            rv = (Element)startingFromThis;
+        } else rv = findClosestParentWithTag(theTag, startingFromThis.getParentNode());
+        return rv;
     }
 }

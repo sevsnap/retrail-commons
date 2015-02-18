@@ -156,21 +156,51 @@ public class PepRequest
     }
 
     @Override
+    public Collection<String> getCategoryIds() {
+        return categories.keySet();
+    }
+    
+    @Override
     public Collection<PepAttributeInterface> getCategory(String category) {
         return categories.get(category);
     }
 
     @Override
-    public PepAttributeInterface getAttribute(String category, String id) {
+    public Map<String, Collection<PepAttributeInterface>> getAttributes(String category) {
+        Map<String, Collection<PepAttributeInterface>> map = new HashMap<>();
+        Collection<PepAttributeInterface> c = categories.get(category);
+        if (c != null) {
+            for (PepAttributeInterface a : c) {
+                Collection<PepAttributeInterface> al = map.get(a.getId());
+                if(al == null) {
+                    al = new ArrayList<>(1);
+                    map.put(a.getId(), al);
+                }
+                al.add(a);
+            }
+        }
+        return map;
+    }
+    
+    @Override
+    public Collection<PepAttributeInterface> getAttributes(String category, String id) {
+        Collection<PepAttributeInterface> al = new ArrayList<>(1);
         Collection<PepAttributeInterface> c = categories.get(category);
         if (c != null) {
             for (PepAttributeInterface a : c) {
                 if (id.equals(a.getId()) && category.equals(a.getCategory())) {
-                    return a;
+                    al.add(a);
                 }
             }
         }
-        return null;
+        return al;
+    }
+
+    @Override
+    public PepAttributeInterface getAttribute(String category, String id) {
+        Collection<PepAttributeInterface> al = getAttributes(category, id);
+        assert(al.size() < 2);
+        return al.iterator().next();
     }
 
     @Override
