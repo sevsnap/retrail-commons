@@ -9,5 +9,5 @@ package it.cnr.iit.retrail.commons;
  * @author oneadmin
  */
 public enum Status {
-    UNKNOWN, TRY, ONGOING, REVOKED, DELETED, REJECTED
+    UNKNOWN, INIT, TRY, ONGOING, REVOKED, DELETED, REJECTED
 }

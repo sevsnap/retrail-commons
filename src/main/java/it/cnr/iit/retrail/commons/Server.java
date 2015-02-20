@@ -122,6 +122,14 @@ public class Server implements Runnable {
             watchdogMonitor.notifyAll();
         }
     }
+    
+    public void wakeup() {
+        log.warn("awakening watchdog!");
+        synchronized(watchdogMonitor) {
+            watchdogMonitor.notifyAll();
+        }
+    }
+    
     @Override
     public void run() {
         // heartbeat
