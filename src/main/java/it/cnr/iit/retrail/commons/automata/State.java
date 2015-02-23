@@ -4,6 +4,7 @@
  */
 package it.cnr.iit.retrail.commons.automata;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class State implements StateInterface {
     protected static final Logger log = LoggerFactory.getLogger(State.class); 
     protected final AutomatonInterface automaton;
-    protected final Map<ActionInterface, StateInterface> map = new HashMap<>();
+    protected final Collection<ActionInterface> actions = new ArrayList<>();
     
     public State(AutomatonInterface automaton) {
         this.automaton = automaton;
@@ -37,29 +38,28 @@ public class State implements StateInterface {
     @Override
     public Collection<String> getNextInputs() {
         Collection<String> nextInputs = new HashSet<>();
-        for(ActionInterface a: map.keySet())
+        for(ActionInterface a: actions)
             nextInputs.add(a.getName());
         return nextInputs;
     }
 
     @Override
     public Collection<ActionInterface> getNextActions() {
-        return map.keySet();
+        return actions;
     }
 
     @Override
-    public Collection<StateInterface> getNextStates() {
-        return map.values();
-    }
-
-    @Override
-    public void addArc(ActionInterface action, StateInterface toState) {
-        map.put(action, toState);
+    public void setActions(ActionInterface[] actions) {
+        this.actions.clear();
+        for(ActionInterface action: actions) {
+            this.actions.add(action);
+            action.setOriginState(this);
+        }
     }
 
     @Override
     public ActionInterface getAction(String actionName) {
-        for(ActionInterface a: map.keySet())
+        for(ActionInterface a: actions)
             if(a.getName().equals(actionName))
                 return a;
         throw new UnsupportedOperationException("Invalid action "+actionName+" in state "+this);

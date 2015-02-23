@@ -4,6 +4,9 @@
  */
 package it.cnr.iit.retrail.commons.automata;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,22 +17,29 @@ import org.slf4j.LoggerFactory;
  */
 public class Automaton implements AutomatonInterface {
     protected static final Logger log = LoggerFactory.getLogger(Automaton.class); 
-    protected final StateInterface begin;
-    protected final StateInterface end;
+    protected StateInterface begin;
+    protected StateInterface[] end;
     protected StateInterface state;
-    protected Map<StateInterface,Map<ActionInterface,StateInterface>> states;
+    protected final Map<String,StateInterface> states = new HashMap<>();
   
-    
     public Automaton() {
         this.begin = new State(this);
-        this.end = begin;
+        this.end = new StateInterface[]{begin};
         this.state = begin;
+        this.states.put(begin.getName(), begin);
     }
     
-    public Automaton(State begin, State end) {
+    public void init(StateInterface begin, StateInterface[] end, StateInterface[] states) {
         this.begin = begin;
         this.end = end;
         this.state = begin;
+        assert(this.end.length > 0);
+        this.states.clear();
+        this.states.put(begin.getName(), begin);
+        for(StateInterface aState: end)
+            this.states.put(aState.getName(), aState);
+        for(StateInterface aState: states)
+            this.states.put(aState.getName(), aState);
     }
     
     @Override
@@ -38,18 +48,31 @@ public class Automaton implements AutomatonInterface {
     }
 
     @Override
+    public StateInterface[] getStates() {
+        return (StateInterface[]) states.values().toArray();
+    }
+    
+    @Override
     public StateInterface getBegin() {
-        return getState(begin.getName());
+        return begin;
     }
 
     @Override
-    public StateInterface getEnd() {
-        return getState(end.getName());
+    public StateInterface[] getEnd() {
+        return end;
+    }
+    
+    @Override
+    public boolean isFinished() {
+        for(StateInterface aState: end)
+            if(aState == getCurrentState())
+                return true;
+        return false;
     }
 
     @Override
     public StateInterface getState(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return states.get(name);
     }
 
     @Override

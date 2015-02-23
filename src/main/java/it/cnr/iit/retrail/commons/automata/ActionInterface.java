@@ -13,4 +13,6 @@ public interface ActionInterface {
     Object execute(Object[] args);
     StateInterface getTargetState();
     AutomatonInterface getAutomaton();
+    StateInterface getOriginState();
+    void setOriginState(StateInterface s);
 }

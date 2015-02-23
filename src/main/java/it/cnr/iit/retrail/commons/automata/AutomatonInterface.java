@@ -4,6 +4,8 @@
  */
 package it.cnr.iit.retrail.commons.automata;
 
+import java.util.Collection;
+
 /**
  *
  * @author oneadmin
@@ -11,12 +13,13 @@ package it.cnr.iit.retrail.commons.automata;
 public interface AutomatonInterface {
     String getName();
     StateInterface getBegin();
-    StateInterface getEnd();
+    StateInterface[] getEnd();
     StateInterface getState(String name);
+    StateInterface[] getStates();
     StateInterface getCurrentState();
     void move(String actionName);
     Object doAction(String actionName, Object[] parms);
     void setCurrentState(StateInterface state);
     void setCurrentState(String stateName);
-    
+    boolean isFinished();
 }

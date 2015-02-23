@@ -15,7 +15,6 @@ public interface StateInterface {
     AutomatonInterface getAutomaton();
     Collection<String> getNextInputs();
     Collection<ActionInterface> getNextActions();
-    Collection<StateInterface> getNextStates();
     ActionInterface getAction(String actionName);
-    void addArc(ActionInterface action, StateInterface toState);
+    void setActions(ActionInterface[] action);
 }
