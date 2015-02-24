@@ -18,28 +18,15 @@ import org.slf4j.LoggerFactory;
 public class Automaton implements AutomatonInterface {
     protected static final Logger log = LoggerFactory.getLogger(Automaton.class); 
     protected StateInterface begin;
-    protected StateInterface[] end;
+    protected final Collection<StateInterface> end = new ArrayList<>();
     protected StateInterface state;
     protected final Map<String,StateInterface> states = new HashMap<>();
   
     public Automaton() {
-        this.begin = new State(this);
-        this.end = new StateInterface[]{begin};
-        this.state = begin;
-        this.states.put(begin.getName(), begin);
     }
     
-    public void init(StateInterface begin, StateInterface[] end, StateInterface[] states) {
-        this.begin = begin;
-        this.end = end;
-        this.state = begin;
-        assert(this.end.length > 0);
-        this.states.clear();
-        this.states.put(begin.getName(), begin);
-        for(StateInterface aState: end)
-            this.states.put(aState.getName(), aState);
-        for(StateInterface aState: states)
-            this.states.put(aState.getName(), aState);
+    public void addState(StateInterface state) {
+        this.states.put(state.getName(), state);
     }
     
     @Override
@@ -48,26 +35,37 @@ public class Automaton implements AutomatonInterface {
     }
 
     @Override
-    public StateInterface[] getStates() {
-        return (StateInterface[]) states.values().toArray();
+    public Collection<StateInterface> getStates() {
+        return states.values();
     }
     
     @Override
     public StateInterface getBegin() {
         return begin;
     }
-
+    
+     public void setBegin(StateInterface begin) {
+        if(this.begin != null)
+             throw new RuntimeException("begin state already defined");
+        if(!this.states.containsValue(begin))
+             throw new RuntimeException("begin state not declared in the automaton");
+        this.begin = begin;
+    }
+     
+    public void addEnd(StateInterface end) {
+        if(!this.states.containsValue(begin))
+             throw new RuntimeException("end state not declared in the automaton");
+        this.end.add(end);
+    }
+    
     @Override
-    public StateInterface[] getEnd() {
+    public Collection<StateInterface> getEnd() {
         return end;
     }
     
     @Override
     public boolean isFinished() {
-        for(StateInterface aState: end)
-            if(aState == getCurrentState())
-                return true;
-        return false;
+        return end.contains(getCurrentState());
     }
 
     @Override
@@ -97,6 +95,13 @@ public class Automaton implements AutomatonInterface {
 
     @Override
     public void setCurrentState(StateInterface state) {
+        // Check automaton is complete
+        if(this.end.isEmpty())
+             throw new RuntimeException("incomplete automaton: end state(s) not defined");
+        if(this.begin == null)
+             throw new RuntimeException("incomplete automaton: begin state not defined");
+        if(state == null)
+            throw new NullPointerException("automaton state cannot be null");
         this.state = state;
     }
 

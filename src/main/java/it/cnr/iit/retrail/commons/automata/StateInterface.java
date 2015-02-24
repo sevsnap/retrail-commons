@@ -12,7 +12,6 @@ import java.util.Collection;
  */
 public interface StateInterface {
     String getName();
-    AutomatonInterface getAutomaton();
     Collection<String> getNextInputs();
     Collection<ActionInterface> getNextActions();
     ActionInterface getAction(String actionName);

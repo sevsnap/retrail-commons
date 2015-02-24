@@ -12,11 +12,12 @@ import org.slf4j.LoggerFactory;
  * @author oneadmin
  */
 public class Action implements ActionInterface {
-    protected  StateInterface originState;
+    protected final StateInterface originState;
     protected final StateInterface targetState;
     protected static final Logger log = LoggerFactory.getLogger(Action.class);  
     
-    public Action(StateInterface targetState) {
+    public Action(StateInterface originState, StateInterface targetState) {
+        this.originState = originState;
         this.targetState = targetState;
     }
     
@@ -34,16 +35,6 @@ public class Action implements ActionInterface {
     @Override
     public StateInterface getOriginState() {
         return originState;
-    }
-
-    @Override
-    public void setOriginState(StateInterface s) {
-        originState = s;
-    }
-
-    @Override
-    public AutomatonInterface getAutomaton() {
-        return targetState.getAutomaton();
     }
 
     @Override

@@ -13,9 +13,9 @@ import java.util.Collection;
 public interface AutomatonInterface {
     String getName();
     StateInterface getBegin();
-    StateInterface[] getEnd();
+    Collection<StateInterface> getEnd();
     StateInterface getState(String name);
-    StateInterface[] getStates();
+    Collection<StateInterface> getStates();
     StateInterface getCurrentState();
     void move(String actionName);
     Object doAction(String actionName, Object[] parms);

@@ -16,21 +16,14 @@ import org.slf4j.LoggerFactory;
  */
 public class State implements StateInterface {
     protected static final Logger log = LoggerFactory.getLogger(State.class); 
-    protected final AutomatonInterface automaton;
     protected final Collection<ActionInterface> actions = new ArrayList<>();
     
-    public State(AutomatonInterface automaton) {
-        this.automaton = automaton;
+    public State() {
     }
     
     @Override
     public String getName() {
         return getClass().getSimpleName();
-    }
-
-    @Override
-    public AutomatonInterface getAutomaton() {
-        return automaton;
     }
 
     @Override
@@ -48,8 +41,8 @@ public class State implements StateInterface {
 
     @Override
     public void addAction(ActionInterface action) {
+        assert(action.getOriginState() == this);
         actions.add(action);
-        action.setOriginState(this);
     }
 
     @Override

@@ -14,24 +14,6 @@ package it.cnr.iit.retrail.commons;
  ******************************************************************************/  
 
 
-/**
- * INTERNAL:
- * <p>
- * <b>Purpose</b>: Define a {@link Set} that tests equality by reference,
- * not equals(). This is required to track objects throughout the lifecycle
- * of a {@link org.eclipse.persistence.sessions.UnitOfWork}, regardless if the domain
- * object redefines its equals() method. Additionally, this implementation does
- * <b>not</b> allow null elements.
- * <p>
- * This class does <b>not</b> inherit from {@link AbstractSet} because the
- * method {@link AbstractSet#removeAll removeAll(Collection c)} does not work
- * correctly with reference equality testing (NB the Javadocs for
- * {@link AbstractCollection} indicates that removeAll is an optional method).
- *
- * @author Mike Norman (since TopLink 10.1.3)
- *
- */
-
 // J2SE imports
 import java.io.*;
 import java.util.*;
@@ -59,8 +41,6 @@ public class IdentityHashSet extends AbstractCollection implements Set, Cloneabl
      * @param initialCapacity the initial capacity of the
      * <tt>IdentityHashSet</tt>.
      * @param loadFactor the loadFactor of the <tt>IdentityHashSet</tt>.
-     * @throws <tt>IllegalArgumentException</tt> if the initial capacity is less
-     * than zero, or if the loadFactor is nonpositive.
      */
     public IdentityHashSet(int initialCapacity, float loadFactor) {
         if (initialCapacity < 0) {
@@ -88,8 +68,6 @@ public class IdentityHashSet extends AbstractCollection implements Set, Cloneabl
      * initial capacity and a default loadFactor of <tt>0.75</tt>.
      *
      * @param initialCapacity the initial capacity of the IdentityHashSet.
-     * @throws <tt>IllegalArgumentException</tt> if the initial capacity is less
-     * than zero.
      */
     public IdentityHashSet(int initialCapacity) {
         this(initialCapacity, DEFAULT_LOAD_FACTOR);
@@ -187,9 +165,9 @@ public class IdentityHashSet extends AbstractCollection implements Set, Cloneabl
      * @param obj object to add.
      * @return <tt>true</tt> if this <tt>IdentityHashSet</tt> did not
      * already contain obj.
-     * @throws <tt>NullPointerException</tt> if obj is null.
      */
-    public boolean add(Object obj) {
+    @Override
+    public boolean add(Object obj)  {
         if (obj == null) {
             throw new NullPointerException();
         }
@@ -251,7 +229,7 @@ public class IdentityHashSet extends AbstractCollection implements Set, Cloneabl
     /**
      * This implementation throws an <tt>UnsupportedOperationException</tt>
      * because <tt>removeAll</tt> does not work correctly with reference
-     * equality testing.<p>
+     * equality testing.
      */
     public boolean removeAll(Collection c) {
         throw new UnsupportedOperationException("IdentityHashSet removeAll");
@@ -260,7 +238,7 @@ public class IdentityHashSet extends AbstractCollection implements Set, Cloneabl
     /**
      * This implementation throws an <tt>UnsupportedOperationException</tt>.
      * The Javadocs for {@link AbstractCollection} indicates that <tt>retainAll</tt>
-     * is an optional method.<p>
+     * is an optional method.
      */
     public boolean retainAll(Collection c) {
         throw new UnsupportedOperationException("IdentityHashSet retainAll");
