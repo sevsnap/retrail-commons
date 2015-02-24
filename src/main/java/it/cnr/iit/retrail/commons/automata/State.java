@@ -6,9 +6,7 @@ package it.cnr.iit.retrail.commons.automata;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,12 +47,9 @@ public class State implements StateInterface {
     }
 
     @Override
-    public void setActions(ActionInterface[] actions) {
-        this.actions.clear();
-        for(ActionInterface action: actions) {
-            this.actions.add(action);
-            action.setOriginState(this);
-        }
+    public void addAction(ActionInterface action) {
+        actions.add(action);
+        action.setOriginState(this);
     }
 
     @Override

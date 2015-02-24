@@ -16,5 +16,5 @@ public interface StateInterface {
     Collection<String> getNextInputs();
     Collection<ActionInterface> getNextActions();
     ActionInterface getAction(String actionName);
-    void setActions(ActionInterface[] action);
+    void addAction(ActionInterface action);
 }
