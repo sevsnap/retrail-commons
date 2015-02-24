@@ -42,4 +42,9 @@ public class Action implements ActionInterface {
         return getClass().getSimpleName();
     }
     
+    @Override 
+    public String toString() {
+        return getName()+"() -> "+getTargetState();
+    }
+    
 }

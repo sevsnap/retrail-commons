@@ -5,9 +5,8 @@
 
 package it.cnr.iit.retrail.commons.impl;
 
-import it.cnr.iit.retrail.commons.DomUtils;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -30,7 +29,7 @@ public class PepResponse {
 
     protected DecisionEnum decision = DecisionEnum.Indeterminate;
     protected String message = "";
-    protected Collection<String> obligations = new ArrayList<>();
+    protected List<String> obligations = new ArrayList<>();
 
     public PepResponse(Document doc) {
         setResponse(doc);
@@ -84,11 +83,11 @@ public class PepResponse {
         this.message = message;
     }
 
-    public Collection<String> getObligations() {
+    public List<String> getObligations() {
         return obligations;
     }
     
-    public void setObligations(Collection<String> obligations) {
+    public void setObligations(List<String> obligations) {
         this.obligations = obligations;
     }
     

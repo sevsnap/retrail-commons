@@ -53,4 +53,9 @@ public class State implements StateInterface {
         throw new UnsupportedOperationException("Invalid action "+actionName+" in state "+this);
     }
     
+    @Override
+    public String toString() {
+        return getName()+"[class="+getClass().getSimpleName()+"]";
+    }
+    
 }

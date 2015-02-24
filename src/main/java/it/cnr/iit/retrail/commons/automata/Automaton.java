@@ -110,4 +110,12 @@ public class Automaton implements AutomatonInterface {
         setCurrentState(getState(stateName));
     }
     
+    public void printInfo() {
+        log.info(this+": state->actions mapping");
+        for(StateInterface s: getStates()) {
+            for(ActionInterface a: s.getNextActions())
+                log.info("\t"+s+"."+a);
+        }
+    }
+    
 }
