@@ -7,7 +7,7 @@ package it.cnr.iit.retrail.commons.impl;
 
 import it.cnr.iit.retrail.commons.DomUtils;
 import it.cnr.iit.retrail.commons.PepSessionInterface;
-import it.cnr.iit.retrail.commons.Status;
+import it.cnr.iit.retrail.commons.StateType;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -27,7 +27,8 @@ public class PepSession extends PepResponse implements PepSessionInterface {
     private String uuid, customId;
     private URL uconUrl;
     private Map<String,Object> localInfo = new HashMap<>();
-    private Status status = Status.UNKNOWN;
+    private StateType stateType = StateType.UNKNOWN;
+    private String stateName;
     private long ms;
 
     public PepSession() throws Exception {
@@ -59,13 +60,13 @@ public class PepSession extends PepResponse implements PepSessionInterface {
     }
 
     @Override
-    public Status getStatus() {
-        return status;
+    public StateType getStateType() {
+        return stateType;
     }
 
     @Override
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setStateType(StateType stateType) {
+        this.stateType = stateType;
     }
 
     @Override
@@ -103,7 +104,8 @@ public class PepSession extends PepResponse implements PepSessionInterface {
         if (session != null) {
             setUuid(session.getAttributeNS(null, "uuid"));
             setCustomId(session.getAttributeNS(null, "customId"));
-            setStatus(Status.valueOf(session.getAttributeNS(null, "status")));
+            setStateType(StateType.valueOf(session.getAttributeNS(null, "stateType")));
+            setStateName(session.getAttributeNS(null, "stateName"));
             String urlString = session.getAttributeNS(null, "uconUrl");
             setUconUrl(urlString.length() == 0 ? null : new URL(urlString));
             String msString = session.getAttributeNS(null, "ms");
@@ -111,10 +113,20 @@ public class PepSession extends PepResponse implements PepSessionInterface {
         } else {
             setUuid(null);
             setCustomId(null);
-            setStatus(Status.UNKNOWN);
+            setStateType(StateType.UNKNOWN);
             setUconUrl(null);            
             setMs(0);
         }
+    }
+
+    @Override
+    public String getStateName() {
+        return stateName;
+    }
+
+    @Override
+    public void setStateName(String stateName) {
+        this.stateName = stateName;
     }
 
     @Override
@@ -140,8 +152,11 @@ public class PepSession extends PepResponse implements PepSessionInterface {
         if (getUconUrl() != null) {
             session.setAttributeNS(null, "uconUrl", getUconUrl().toString());
         }
-        if (getStatus() != null) {
-            session.setAttributeNS(null, "status", getStatus().name());
+        if (getStateType() != null) {
+            session.setAttributeNS(null, "stateType", getStateType().name());
+        }
+        if (getStateName() != null) {
+            session.setAttributeNS(null, "stateName", getStateName());
         }
         if (getMs() != 0) {
             session.setAttributeNS(null, "ms", ""+getMs());
@@ -162,7 +177,8 @@ public class PepSession extends PepResponse implements PepSessionInterface {
         if (getMessage() != null && getMessage().length() > 0) {
             s += ", message=" + getMessage();
         }
-        s += ", status=" + getStatus();
+        s += ", stateType=" + getStateType();
+        s += ", stateName=" + getStateName();
         if (getUconUrl() != null) {
             s += ", uconUrl=" + getUconUrl();
         }

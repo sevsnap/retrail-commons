@@ -8,7 +8,7 @@ package it.cnr.iit.retrail.commons;
  *
  * @author oneadmin
  */
-public enum Status {
+public enum StateType {
     UNKNOWN,
-    BEGIN, STANDARD, ONGOING, REVOKED, END
+    BEGIN, PASSIVE, ONGOING, REVOKED, END
 }

@@ -26,7 +26,13 @@ public interface PepSessionInterface extends Serializable {
      * Get the status of the session.
      * @return the status of the session.
      */
-    Status getStatus();
+    StateType getStateType();
+    
+    /**
+     * Get the state name of the session.
+     * @return the state name of the session.
+     */
+    String getStateName();
 
     /**
      * Get the url of the UCon service handling this session.
@@ -50,9 +56,16 @@ public interface PepSessionInterface extends Serializable {
     /**
      * Set the status of the session.
      * Note: this method should be invoked by the UCon only.
-     * @param status the new status of the session.
+     * @param stateType the new status of the session.
      */
-    void setStatus(Status status);
+    void setStateType(StateType stateType);
+
+    /**
+     * Set the state name of the session.
+     * Note: this method should be invoked by the UCon only.
+     * @param stateName the state name of the session.
+     */
+    void setStateName(String stateName);
 
     /**
      * Set the url of the UCon service.
