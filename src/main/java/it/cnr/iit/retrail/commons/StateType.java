@@ -10,5 +10,5 @@ package it.cnr.iit.retrail.commons;
  */
 public enum StateType {
     UNKNOWN,
-    BEGIN, PASSIVE, ONGOING, REVOKED, END
+    BEGIN, PASSIVE, ONGOING, END
 }
