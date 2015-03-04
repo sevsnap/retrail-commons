@@ -22,6 +22,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -114,14 +116,25 @@ public class DomUtils {
         }
         return al;
     }
-
+    
+    private static final BeanUtilsBean beanUtilsBean = new BeanUtilsBean(new ConvertUtilsBean() {
+            @Override
+            public Object convert(String value, Class clazz) {
+                  if (clazz.isEnum()){
+                       return Enum.valueOf(clazz, value);
+                  }else{
+                       return super.convert(value, clazz);
+                  }
+           }
+        });
+    
     public static void setPropertyOnObjectNS(String ns, String theTag, Node startingFromThis, Object o) {
         List<Element> pl = findDirectChildrenWithTagNS(ns, theTag, startingFromThis);
         for (Element propertyElement : pl) {
             String propertyName = propertyElement.getAttributeNS(null, "name");
             String propertyValue = propertyElement.getTextContent();
             try {
-                BeanUtils.setProperty(o, propertyName, propertyValue);
+                beanUtilsBean.setProperty(o, propertyName, propertyValue);
             } catch (InvocationTargetException | IllegalAccessException e) {
                 throw new RuntimeException("cannot set property " + propertyName + " for " + o + ": " + e);
             }
