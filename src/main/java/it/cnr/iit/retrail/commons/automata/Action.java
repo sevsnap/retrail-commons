@@ -18,7 +18,9 @@ public class Action implements ActionInterface {
     
     public Action(StateInterface originState, StateInterface targetState) {
         this.originState = originState;
-        this.targetState = targetState;
+        this.targetState = targetState == null? originState : targetState;
+        if(originState == null) 
+            throw new RuntimeException(this+" must have originState set");
     }
     
     @Override
