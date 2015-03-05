@@ -118,6 +118,7 @@ public class PepRequest
             categories.put(attribute.getCategory(), categoryList);
         }
         assert (attribute.getId() != null);
+/*
         for (PepAttributeInterface a : categoryList) {
             if (a.getId().equals(attribute.getId())) {
                 log.debug("attribute {} already present as {}", attribute, a);
@@ -127,6 +128,7 @@ public class PepRequest
                 break;
             }
         }
+*/
         log.debug("adding " + attribute);
         categoryList.add(attribute);
         return super.add(attribute);
