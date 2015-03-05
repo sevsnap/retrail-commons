@@ -24,8 +24,7 @@ public interface PepRequestInterface extends Collection<PepAttributeInterface>, 
      * @param id the uri id for the attribute.
      * @return null if none could be found, the PepAttributeInstance instead.
      */
-    PepAttributeInterface getAttribute(String category, String id);
-    
+
     Collection<PepAttributeInterface> getAttributes(String category, String id);
 
     /**

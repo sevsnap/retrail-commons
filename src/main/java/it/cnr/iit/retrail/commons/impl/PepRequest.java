@@ -197,13 +197,6 @@ public class PepRequest
     }
 
     @Override
-    public PepAttributeInterface getAttribute(String category, String id) {
-        Collection<PepAttributeInterface> al = getAttributes(category, id);
-        assert(al.size() < 2);
-        return al.iterator().next();
-    }
-
-    @Override
     public Element toElement() throws Exception {
         // we now build the request, using balana as much as possible.
         RequestElementDTO requestElementDTO = new RequestElementDTO();
