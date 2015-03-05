@@ -4,9 +4,9 @@
  */
 package it.cnr.iit.retrail.commons.automata;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class State implements StateInterface {
     protected static final Logger log = LoggerFactory.getLogger(State.class); 
-    protected final Collection<ActionInterface> actions = new ArrayList<>();
+    private final Map<String,ActionInterface> actionMap = new HashMap<>();
     
     public State() {
     }
@@ -28,29 +28,28 @@ public class State implements StateInterface {
 
     @Override
     public Collection<String> getNextInputs() {
-        Collection<String> nextInputs = new HashSet<>();
-        for(ActionInterface a: actions)
-            nextInputs.add(a.getName());
-        return nextInputs;
+        return actionMap.keySet();
     }
 
     @Override
     public Collection<ActionInterface> getNextActions() {
-        return actions;
+        return actionMap.values();
     }
 
     @Override
     public void addAction(ActionInterface action) {
         assert(action.getOriginState() == this);
-        actions.add(action);
+        if(actionMap.containsKey(action.getName()))
+            throw new RuntimeException("cannot add action "+action.getName()+" to "+this+": state already has an action with the same name");
+        actionMap.put(action.getName(), action);
     }
 
     @Override
     public ActionInterface getAction(String actionName) {
-        for(ActionInterface a: actions)
-            if(a.getName().equals(actionName))
-                return a;
-        throw new UnsupportedOperationException("Invalid action "+actionName+" in state "+this);
+        ActionInterface a = actionMap.get(actionName);
+        if(a == null)
+            throw new UnsupportedOperationException("Invalid action "+actionName+" in state "+this);
+        return a;
     }
     
     @Override

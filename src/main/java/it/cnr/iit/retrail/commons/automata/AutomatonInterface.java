@@ -22,4 +22,5 @@ public interface AutomatonInterface {
     void setCurrentState(StateInterface state);
     void setCurrentState(String stateName);
     boolean isFinished();
+    void checkIntegrity();
 }

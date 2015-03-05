@@ -110,6 +110,28 @@ public class Automaton implements AutomatonInterface {
         setCurrentState(getState(stateName));
     }
     
+    @Override
+    public void checkIntegrity() {
+        log.info("checking automaton integrity");
+        StateInterface b = getBegin();
+        if(b == null)
+            throw new RuntimeException("automaton has no initial state");
+        Collection<StateInterface> el = getEnd();
+        if(b.getNextActions().isEmpty() && !el.contains(b))
+            throw new RuntimeException("initial state "+b+" is a dead-end (has no outgoing action)");
+        if(el.isEmpty())
+            throw new RuntimeException("automaton has no end state");            
+        for(StateInterface e: el) {
+            if(!e.getNextActions().isEmpty() && b != e)
+                throw new RuntimeException("end state "+e+" must be a dead-end (must not have outgoing actions)");
+        }
+        for(StateInterface e: getStates()) {
+            if(e.getNextActions().isEmpty() && !el.contains(e))
+                throw new RuntimeException("state "+e+" is a dead-end (has no outgoing actions)");
+        }
+        log.info("automaton integrity looks ok");
+    }
+    
     public void printInfo() {
         log.info(this+": state->actions mapping");
         for(StateInterface s: getStates()) {
