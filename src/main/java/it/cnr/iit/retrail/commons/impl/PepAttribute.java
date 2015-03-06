@@ -40,6 +40,8 @@ public class PepAttribute implements PepAttributeInterface {
         //static final public String EMAIL = PolicyConstants.DataType.RFC;
         static final public String EMAIL = PolicyConstants.DataType.STRING;   //FIXME
         static final public String BOOLEAN = PolicyConstants.DataType.BOOLEAN;
+        static final public String INTEGER = PolicyConstants.DataType.INT;
+        static final public String DOUBLE = PolicyConstants.DataType.DOUBLE;
     }
     
     public static PepAttribute newSubject(String subject, String issuer) {
