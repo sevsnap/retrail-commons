@@ -104,12 +104,8 @@ public class PepSession extends PepResponse implements PepSessionInterface {
         if (session != null) {
             setUuid(session.getAttributeNS(null, "uuid"));
             setCustomId(session.getAttributeNS(null, "customId"));
-            // FIXME REMOVE THIS PATCH
-            try {
-                setStateType(StateType.valueOf(session.getAttributeNS(null, "stateType")));
-            } catch(IllegalArgumentException e) {
-                setStateType(StateType.PASSIVE);
-            }
+            setStateType(StateType.valueOf(session.getAttributeNS(null, "stateType")));
+            setStateName(session.getAttributeNS(null, "stateName"));
             String urlString = session.getAttributeNS(null, "uconUrl");
             setUconUrl(urlString.length() == 0 ? null : new URL(urlString));
             String msString = session.getAttributeNS(null, "ms");
