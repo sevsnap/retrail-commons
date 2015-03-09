@@ -32,10 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-public final class Client extends XmlRpcClient implements RecorderInterface {
-    protected static final Logger log = LoggerFactory.getLogger(Client.class);
+public class Client extends XmlRpcClient implements RecorderInterface {
+    protected final Logger log;
     FileWriter out;
     private long millis;
+    protected final XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 
     static private final String openTag = "<retrailRecorder>";
     static private final String closeTag = "</retrailRecorder>";
@@ -183,17 +184,40 @@ public final class Client extends XmlRpcClient implements RecorderInterface {
         return millis;
     }
 
+    public double getConnectionTimeout() {
+        return config.getConnectionTimeout()/1000.0;
+    }
+
+    public void setConnectionTimeout(double connectionTimeout) {
+        log.info("setting connection timeout={}s", connectionTimeout);
+        config.setConnectionTimeout((int)(connectionTimeout*1000));
+        setConfig(config);
+    }
+
+    public double getReplyTimeout() {
+        return config.getReplyTimeout()/1000.0;
+    }
+
+    public void setReplyTimeout(double replyTimeout) {
+        log.info("setting reply timeout={}s", replyTimeout);
+        config.setReplyTimeout((int)(replyTimeout*1000));
+        setConfig(config);
+    }
+
+    public void setServerURL(URL url) {
+        config.setServerURL(url);
+        setConfig(config);
+    }
+    
     public Client(URL serverUrl) throws Exception {
         super();
-        XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-        config.setServerURL(serverUrl);
+        log = LoggerFactory.getLogger(getClass());
+        if(serverUrl != null)
+            config.setServerURL(serverUrl);
         config.setEnabledForExtensions(true);
-        config.setConnectionTimeout(60 * 1000);
-        config.setReplyTimeout(60 * 1000);
-        
-        stopRecording();
-
-        // set configuration
+        config.setConnectionTimeout(2 * 1000);
+        config.setReplyTimeout(8 * 1000);   
         setConfig(config);
+        stopRecording();
     }
 }
