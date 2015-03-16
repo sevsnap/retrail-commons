@@ -110,7 +110,8 @@ public class Client extends XmlRpcClient implements RecorderInterface {
     
     @Override
     public synchronized void startRecording(File outputFile) throws Exception {
-        stopRecording();
+        if(out != null)
+            throw new RuntimeException("already recording session");
         log.info("switching log recorder ON. Logging to {}", outputFile.getAbsolutePath());
         out = new FileWriter(outputFile, false);
         out.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+openTag+"\n");
