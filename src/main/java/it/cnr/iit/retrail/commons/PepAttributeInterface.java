@@ -6,6 +6,7 @@ package it.cnr.iit.retrail.commons;
 
 import java.io.Serializable;
 import java.util.Date;
+import org.w3c.dom.Element;
 
 public interface PepAttributeInterface extends Serializable {
 

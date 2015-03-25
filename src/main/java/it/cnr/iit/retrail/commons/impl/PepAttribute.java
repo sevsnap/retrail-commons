@@ -5,10 +5,16 @@
 
 package it.cnr.iit.retrail.commons.impl;
 
+import it.cnr.iit.retrail.commons.DomUtils;
 import it.cnr.iit.retrail.commons.PepAttributeInterface;
+import java.util.Arrays;
 import java.util.Date;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.wso2.balana.utils.Constants.PolicyConstants;
+import org.wso2.balana.utils.PolicyUtils;
+import org.wso2.balana.utils.policy.dto.AttributeElementDTO;
+import org.wso2.balana.utils.policy.dto.AttributesElementDTO;
 
 /**
  *
@@ -167,5 +173,23 @@ public class PepAttribute implements PepAttributeInterface {
     public String toString() {
         return "PepRequestAttribute [id="+id+", value="+value+", factory="+factory+"]";
     }
+    
+    public Element toElement() throws Exception {
+        AttributesElementDTO attributesElementDTO = new AttributesElementDTO();
+        AttributeElementDTO elementDTO = new AttributeElementDTO();
+        elementDTO.setAttributeId(getId());
+        elementDTO.setDataType(getType());
+        elementDTO.setIncludeInResult(false);
+        elementDTO.setIssuer(getIssuer());
+        elementDTO.setAttributeValues(Arrays.asList(getValue()));
+        attributesElementDTO.addAttributeElementDTO(elementDTO);
+        // root element
+        Document doc = DomUtils.newDocument();
+        Element root = PolicyUtils.createAttributesElement(attributesElementDTO, doc);
+        doc.appendChild(root);
+        System.out.println("DOCUMENT XXX: "+ DomUtils.toString(root.getFirstChild()));
+        return (Element)root.getFirstChild();
+    }
 
+    
 }
