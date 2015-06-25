@@ -53,7 +53,7 @@ public class Automaton implements AutomatonInterface {
     }
      
     public void addEnd(StateInterface end) {
-        if(!this.states.containsValue(begin))
+        if(!this.states.containsValue(end))  
              throw new RuntimeException("end state not declared in the automaton");
         this.end.add(end);
     }
